@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useCartStore } from '../../store/useCartStore';
+import { useToastStore } from '../../store/useToastStore';
 import { supabase, isMockMode } from '../../lib/supabase/client';
 
 interface Product {
@@ -136,7 +137,7 @@ export function ProductFinder({ inputRef }: ProductFinderProps) {
       if (selectedIndex >= 0 && selectedIndex < results.length) {
         const prod = results[selectedIndex];
         if (prod.stock <= 0) {
-          alert(`¡Ojo! '${prod.nombre}' no tiene stock disponible.`);
+          useToastStore.getState().addToast(`El producto '${prod.nombre}' no tiene stock disponible.`, 'error');
         }
         
         addToCart({
@@ -179,11 +180,11 @@ export function ProductFinder({ inputRef }: ProductFinderProps) {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder="Escanear código o escribir nombre del producto (F8)"
+          placeholder="[F8] Escanear código o escribir nombre del producto..."
           className="
             w-full rounded-2xl border border-slate-200 bg-white px-6 py-4 pl-12 pr-12 text-sm text-slate-800 placeholder-slate-400
             transition-all duration-300 outline-none
-            focus:border-emerald-600 focus:bg-white focus:shadow-[0_4px_20px_-3px_rgba(16,185,129,0.12)] focus:ring-1 focus:ring-emerald-600/20
+            focus:border-orange-600 focus:bg-white focus:shadow-[0_4px_20px_-3px_rgba(16,185,129,0.12)] focus:ring-1 focus:ring-orange-600/20
           "
         />
         
@@ -197,7 +198,7 @@ export function ProductFinder({ inputRef }: ProductFinderProps) {
         {/* Loading Spinner */}
         {loading && (
           <div className="absolute right-4">
-            <div className="h-5 w-5 animate-spin rounded-full border-2 border-emerald-500 border-t-transparent" />
+            <div className="h-5 w-5 animate-spin rounded-full border-2 border-orange-500 border-t-transparent" />
           </div>
         )}
       </div>
@@ -217,7 +218,7 @@ export function ProductFinder({ inputRef }: ProductFinderProps) {
                 className={`
                   flex w-full items-center justify-between rounded-xl px-4 py-3 text-left transition-all duration-200
                   ${isSelected 
-                    ? 'bg-gradient-to-r from-emerald-50 to-teal-50 text-slate-800 border-l-4 border-emerald-600 font-medium' 
+                    ? 'bg-gradient-to-r from-orange-50 to-amber-50 text-slate-800 border-l-4 border-orange-600 font-medium' 
                     : 'text-slate-600 hover:bg-slate-50'
                   }
                 `}
@@ -227,7 +228,7 @@ export function ProductFinder({ inputRef }: ProductFinderProps) {
                   <div className="font-mono text-[11px] text-slate-400">Cod: {prod.codigo}</div>
                 </div>
                 <div className="text-right">
-                  <div className="font-mono font-bold text-emerald-600">S/ {Number(prod.precio_venta).toFixed(2)}</div>
+                  <div className="font-mono font-bold text-orange-600">S/ {Number(prod.precio_venta).toFixed(2)}</div>
                   <div className={`text-[10px] ${prod.stock < 5 ? 'text-rose-600 font-bold' : 'text-slate-400'}`}>
                     Stock: {prod.stock}
                   </div>

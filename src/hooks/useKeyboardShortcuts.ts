@@ -1,5 +1,6 @@
 import { useHotkeys } from 'react-hotkeys-hook';
 import { useCartStore } from '../store/useCartStore';
+import { useConfirmStore } from '../store/useConfirmStore';
 import { RefObject } from 'react';
 
 interface KeyboardShortcutsProps {
@@ -19,7 +20,6 @@ export function useKeyboardShortcuts({
   const {
     tabs,
     activeTabIndex,
-    modo,
     selectedCartItemIndex,
     setActiveTab,
     setSelectedCartItemIndex,
@@ -65,6 +65,18 @@ export function useKeyboardShortcuts({
   }, hotkeyOptions);
 
 
+  // --- ENFOQUE DE LA CALCULADORA AL PESO (F7) ---
+  
+  useHotkeys('f7', (e) => {
+    e.preventDefault();
+    const quickInput = document.querySelector('input[name="quick-item-name"]') as HTMLInputElement | null;
+    if (quickInput) {
+      quickInput.focus();
+      quickInput.select();
+    }
+  }, hotkeyOptions);
+
+
   // --- ENFOQUE DEL BUSCADOR DE PRODUCTOS (F8) ---
   
   useHotkeys('f8', (e) => {
@@ -80,10 +92,21 @@ export function useKeyboardShortcuts({
   
   useHotkeys('f9', (e) => {
     e.preventDefault();
-    const cobroInput = document.querySelector('input[type="number"][placeholder="0.00"]') as HTMLInputElement | null;
+    const cobroInput = document.querySelector('input[name="monto-pago"]') as HTMLInputElement | null;
     if (cobroInput) {
       cobroInput.focus();
       cobroInput.select();
+    }
+  }, hotkeyOptions);
+
+
+  // --- CIERRE DE CAJA DIARIA (F10) ---
+  
+  useHotkeys('f10', (e) => {
+    e.preventDefault();
+    const btnCierre = document.getElementById('btn-cierre-caja') as HTMLButtonElement | null;
+    if (btnCierre) {
+      btnCierre.click();
     }
   }, hotkeyOptions);
 
@@ -115,7 +138,11 @@ export function useKeyboardShortcuts({
   useHotkeys('+', (e) => {
     // Solo aplicar si el buscador NO está enfocado con texto y hay un item del carrito seleccionado
     const isSearching = document.activeElement === searchInputRef.current;
-    if (!isSearching && selectedCartItemIndex >= 0 && selectedCartItemIndex < items.length) {
+    const isEditingWeight = document.activeElement?.getAttribute('name') === 'quick-item-weight';
+    const isEditingPrice = document.activeElement?.getAttribute('name') === 'quick-item-price';
+    const isEditingName = document.activeElement?.getAttribute('name') === 'quick-item-name';
+    
+    if (!isSearching && !isEditingWeight && !isEditingPrice && !isEditingName && selectedCartItemIndex >= 0 && selectedCartItemIndex < items.length) {
       e.preventDefault();
       const targetItem = items[selectedCartItemIndex];
       updateQuantity(targetItem.id, targetItem.cantidad + 1);
@@ -124,7 +151,11 @@ export function useKeyboardShortcuts({
 
   useHotkeys('-', (e) => {
     const isSearching = document.activeElement === searchInputRef.current;
-    if (!isSearching && selectedCartItemIndex >= 0 && selectedCartItemIndex < items.length) {
+    const isEditingWeight = document.activeElement?.getAttribute('name') === 'quick-item-weight';
+    const isEditingPrice = document.activeElement?.getAttribute('name') === 'quick-item-price';
+    const isEditingName = document.activeElement?.getAttribute('name') === 'quick-item-name';
+
+    if (!isSearching && !isEditingWeight && !isEditingPrice && !isEditingName && selectedCartItemIndex >= 0 && selectedCartItemIndex < items.length) {
       e.preventDefault();
       const targetItem = items[selectedCartItemIndex];
       if (targetItem.cantidad > 1) {
@@ -150,35 +181,19 @@ export function useKeyboardShortcuts({
 
 
   // --- PROCESAR / COBRAR LA VENTA (F12) ---
+  
   useHotkeys('f12', (e) => {
     e.preventDefault();
     onProcessCheckout();
   }, hotkeyOptions);
 
 
-  // --- PROCESAR / COBRAR LA VENTA (ENTER) ---
-  useHotkeys('enter', (e) => {
-    const activeElement = document.activeElement;
-    const isEditingQuantity = activeElement?.getAttribute('name') === 'cantidad-item';
-    const isSearching = activeElement === searchInputRef.current;
-    const isInputDeCobro = activeElement?.getAttribute('name') === 'monto-pago';
-    
-    // Si está en el input de cobro, o si no está editando inputs de texto en general (salvo el de cobro)
-    const isEditingOtherInput = activeElement?.tagName === 'INPUT' || activeElement?.tagName === 'TEXTAREA';
 
-    if (!isEditingQuantity && !isSearching && (isInputDeCobro || !isEditingOtherInput)) {
-      e.preventDefault();
-      onProcessCheckout();
-    }
-  }, {
-    enableOnFormTags: true,
-    preventDefault: false,
-  });
 
 
   // --- LIMPIAR PESTAÑA O SELECCIÓN (ESC) ---
   
-  useHotkeys('esc', (e) => {
+    useHotkeys('esc', async (e) => {
     e.preventDefault();
     
     // Si tenemos un item seleccionado en el carrito, quitamos la selección primero
@@ -194,10 +209,21 @@ export function useKeyboardShortcuts({
     }
     
     // Si no, limpia la pestaña actual (carrito vacío)
-    const confirmarLimpieza = window.confirm('¿Seguro que querés limpiar el carrito de este cliente?');
+    const confirmarLimpieza = await useConfirmStore.getState().requestConfirm('¿Está seguro que desea limpiar el carrito de este cliente?');
     if (confirmarLimpieza) {
       clearActiveTab();
     }
+  }, hotkeyOptions);
+
+  // Undo / Redo for cleared carts
+  useHotkeys('ctrl+z, meta+z', (e) => {
+    e.preventDefault();
+    undoClearActiveTab();
+  }, hotkeyOptions);
+
+  useHotkeys('ctrl+y, meta+y', (e) => {
+    e.preventDefault();
+    redoClearActiveTab();
   }, hotkeyOptions);
 }
 export default useKeyboardShortcuts;

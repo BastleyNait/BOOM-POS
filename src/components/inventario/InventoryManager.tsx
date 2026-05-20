@@ -2,11 +2,15 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { useCartStore, MockProduct, MockProveedor, MockPedido } from '../../store/useCartStore';
+import { useCartStore, MockProduct, MockProveedor, MockPedido, CierreDiario } from '../../store/useCartStore';
+import { useToastStore } from '../../store/useToastStore';
+import { useConfirmStore } from '../../store/useConfirmStore';
 
 export function InventoryManager() {
-  // Pestaña Activa: 'productos' | 'compras' | 'proveedores'
-  const [activeTab, setActiveTab] = useState<'productos' | 'compras' | 'proveedores'>('productos');
+  const { addToast } = useToastStore();
+  const { requestConfirm } = useConfirmStore();
+  // Pestaña Activa: 'productos' | 'compras' | 'proveedores' | 'cierres'
+  const [activeTab, setActiveTab] = useState<'productos' | 'compras' | 'proveedores' | 'cierres'>('productos');
 
   // Zustand Store
   const {
@@ -23,7 +27,8 @@ export function InventoryManager() {
     eliminarMockProveedor,
     actualizarMockProveedor,
     cajaActivaId,
-    mockMovimientos
+    mockMovimientos,
+    historialCierres
   } = useCartStore();
 
   // ----------------------------------------------------
@@ -63,6 +68,9 @@ export function InventoryManager() {
   const [pedidoAPagar, setPedidoAPagar] = useState<MockPedido | null>(null);
   const [metodoPagoDeuda, setMetodoPagoDeuda] = useState<'efectivo' | 'billetera_digital'>('efectivo');
   const [cuentaPagoId, setCuentaPagoId] = useState('');
+  
+  // ESTADO MODAL AUDITORIA
+  const [selectedAuditCierre, setSelectedAuditCierre] = useState<CierreDiario | null>(null);
 
   // Sincronizar el primer id de cuenta digital para el pago de deudas
   useEffect(() => {
@@ -143,7 +151,7 @@ export function InventoryManager() {
     e.preventDefault();
 
     if (duplicadoDetectado.existe) {
-      alert('Ya existe un producto con ese RUC/Código/Nombre. Resolvelo en el modal premium, hermano.');
+      addToast('Ya existe un producto con ese RUC/Código/Nombre.', 'warning');
       return;
     }
 
@@ -174,7 +182,7 @@ export function InventoryManager() {
     if (res.success) {
       handleResetForm();
     } else {
-      alert(`Error al guardar: ${res.error}`);
+      addToast(`Error al guardar: ${res.error}`, 'error');
     }
   };
 
@@ -217,7 +225,7 @@ export function InventoryManager() {
     const prod = duplicadoDetectado.producto;
     const adicional = parseInt(stockAConsolidar) || 0;
     if (adicional <= 0) {
-      alert('Ingresá una cantidad válida de stock mayor a cero, loco.');
+      addToast('Ingrese una cantidad válida de stock mayor a cero.', 'warning');
       return;
     }
 
@@ -228,11 +236,11 @@ export function InventoryManager() {
 
     const res = updateMockProduct(actualizado);
     if (res.success) {
-      alert(`¡Buenísimo! Se consolidaron ${adicional} unidades al producto '${prod.nombre}'. Nuevo stock: ${actualizado.stock}.`);
+      addToast(`Se consolidaron ${adicional} unidades al producto '${prod.nombre}'. Nuevo stock: ${actualizado.stock}.`, 'success');
       handleResetForm();
       setStockAConsolidar('');
     } else {
-      alert(`Error al consolidar: ${res.error}`);
+      addToast(`Error al consolidar el stock: ${res.error}`, 'error');
     }
   };
 
@@ -243,13 +251,13 @@ export function InventoryManager() {
     e.preventDefault();
 
     if (!provNombre.trim() || !provRuc.trim()) {
-      alert('Completá Nombre y RUC del proveedor.');
+      addToast('Por favor, complete el Nombre y RUC del proveedor.', 'warning');
       return;
     }
 
     // Validación básica de RUC peruano (11 dígitos)
     if (!/^\d{11}$/.test(provRuc)) {
-      alert('El RUC debe tener exactamente 11 dígitos numéricos, ponete las pilas.');
+      addToast('El RUC debe contener exactamente 11 dígitos numéricos.', 'error');
       return;
     }
 
@@ -297,7 +305,7 @@ export function InventoryManager() {
     if (!pedidoAPagar) return;
 
     if (metodoPagoDeuda === 'billetera_digital' && !cuentaPagoId) {
-      alert('Elegí una billetera digital para realizar el débito.');
+      addToast('Seleccione una billetera digital para realizar el débito.', 'warning');
       return;
     }
 
@@ -305,10 +313,10 @@ export function InventoryManager() {
     if (res.success) {
       const ctaObj = cuentasBilletera.find(c => c.id === cuentaPagoId);
       const ctaNombre = ctaObj ? ctaObj.nombre : 'Billetera Digital';
-      alert(`Deuda pagada correctamente de forma atómica. Canal de Egreso: ${metodoPagoDeuda === 'efectivo' ? 'Efectivo en Caja' : ctaNombre}. Monto liquidado: S/ ${pedidoAPagar.monto_total.toFixed(2)}.`);
+      addToast(`Deuda pagada exitosamente. Canal: ${metodoPagoDeuda === 'efectivo' ? 'Efectivo en Caja' : ctaNombre}. Monto: S/ ${pedidoAPagar.monto_total.toFixed(2)}.`, 'success');
       setPedidoAPagar(null);
     } else {
-      alert(`Error al saldar la deuda: ${res.error}`);
+      addToast(`Error al saldar la deuda: ${res.error}`, 'error');
     }
   };
 
@@ -335,7 +343,7 @@ export function InventoryManager() {
         {/* Encabezado Principal */}
         <header className="flex w-full items-center justify-between border-b border-slate-200/80 pb-4 flex-shrink-0">
           <div>
-            <h1 className="text-2xl font-black bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent tracking-tight leading-none">
+            <h1 className="text-2xl font-black bg-gradient-to-r from-orange-600 to-amber-600 bg-clip-text text-transparent tracking-tight leading-none">
               Panel ERP & Inventario
             </h1>
             <p className="text-[10px] text-slate-400 font-extrabold tracking-widest uppercase mt-1.5">
@@ -357,7 +365,7 @@ export function InventoryManager() {
               onClick={() => setActiveTab('productos')}
               className={`px-4 py-2 text-xs font-black rounded-xl transition-all duration-300 cursor-pointer ${
                 activeTab === 'productos' 
-                  ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-md shadow-emerald-600/10' 
+                  ? 'bg-gradient-to-r from-orange-600 to-amber-600 text-white shadow-md shadow-orange-600/10' 
                   : 'text-slate-500 hover:text-slate-800'
               }`}
             >
@@ -367,7 +375,7 @@ export function InventoryManager() {
               onClick={() => setActiveTab('compras')}
               className={`px-4 py-2 text-xs font-black rounded-xl transition-all duration-300 cursor-pointer relative ${
                 activeTab === 'compras' 
-                  ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-md shadow-emerald-600/10' 
+                  ? 'bg-gradient-to-r from-orange-600 to-amber-600 text-white shadow-md shadow-orange-600/10' 
                   : 'text-slate-500 hover:text-slate-800'
               }`}
             >
@@ -382,11 +390,21 @@ export function InventoryManager() {
               onClick={() => setActiveTab('proveedores')}
               className={`px-4 py-2 text-xs font-black rounded-xl transition-all duration-300 cursor-pointer ${
                 activeTab === 'proveedores' 
-                  ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-md shadow-emerald-600/10' 
+                  ? 'bg-gradient-to-r from-orange-600 to-amber-600 text-white shadow-md shadow-orange-600/10' 
                   : 'text-slate-500 hover:text-slate-800'
               }`}
             >
               👤 PROVEEDORES
+            </button>
+            <button
+              onClick={() => setActiveTab('cierres')}
+              className={`px-4 py-2 text-xs font-black rounded-xl transition-all duration-300 cursor-pointer ${
+                activeTab === 'cierres' 
+                  ? 'bg-gradient-to-r from-orange-600 to-amber-600 text-white shadow-md shadow-orange-600/10' 
+                  : 'text-slate-500 hover:text-slate-800'
+              }`}
+            >
+              📄 REPORTES DE CIERRE
             </button>
           </div>
         </div>
@@ -428,14 +446,14 @@ export function InventoryManager() {
                         <td className="py-3.5 font-sans font-bold text-slate-800">
                           {prod.nombre}
                           {provObj && (
-                            <span className="block text-[10px] text-emerald-600 font-sans font-normal mt-0.5">
+                            <span className="block text-[10px] text-orange-600 font-sans font-normal mt-0.5">
                               Visita: {provObj.dia_visita} ({provObj.nombre})
                             </span>
                           )}
                         </td>
                         <td className="py-3.5 text-xs text-slate-400">{prod.codigo}</td>
                         <td className="py-3.5 text-right text-slate-600">S/ {prod.precio_costo.toFixed(2)}</td>
-                        <td className="py-3.5 text-right text-emerald-600 font-bold">S/ {prod.precio_venta.toFixed(2)}</td>
+                        <td className="py-3.5 text-right text-orange-600 font-bold">S/ {prod.precio_venta.toFixed(2)}</td>
                         <td className="py-3.5 text-right text-indigo-600 font-extrabold">{margenImpl.toFixed(1)}%</td>
                         <td className={`py-3.5 text-right font-black ${isLow ? 'text-rose-600 font-extrabold' : 'text-slate-800'}`}>
                           {prod.stock} {isLow && '⚠️'}
@@ -469,9 +487,9 @@ export function InventoryManager() {
               <button
                 onClick={() => {
                   generateMockSugerencias();
-                  alert('Sugerencias recalculadas en base al stock crítico de productos (< 5 unidades).');
+                  addToast('Sugerencias recalculadas según el stock crítico (< 5 unidades).', 'info');
                 }}
-                className="px-4 py-2 text-[10px] font-black uppercase tracking-wider rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 text-white hover:brightness-105 transition-all shadow-md shadow-emerald-600/10 cursor-pointer"
+                className="px-4 py-2 text-[10px] font-black uppercase tracking-wider rounded-xl bg-gradient-to-r from-orange-600 to-amber-600 text-white hover:brightness-105 transition-all shadow-md shadow-orange-600/10 cursor-pointer"
               >
                 Recalcular Pedidos
               </button>
@@ -501,7 +519,7 @@ export function InventoryManager() {
                           <span className={`px-2 py-0.5 rounded-md text-[8px] font-black uppercase border ${
                             ped.estado === 'pendiente' ? 'bg-amber-50 text-amber-700 border-amber-200' :
                             ped.estado === 'ordenado' ? 'bg-blue-50 text-blue-700 border-blue-200' :
-                            'bg-emerald-50 text-emerald-700 border-emerald-200'
+                            'bg-orange-50 text-orange-700 border-orange-200'
                           }`}>
                             {ped.estado}
                           </span>
@@ -509,7 +527,7 @@ export function InventoryManager() {
                           {ped.estado === 'completado' && (
                             <span className={`px-2 py-0.5 rounded-md text-[8px] font-black uppercase border ${
                               ped.estado_pago === 'pagado'
-                                ? 'bg-emerald-100 text-emerald-800 border-emerald-200'
+                                ? 'bg-orange-100 text-orange-800 border-orange-200'
                                 : 'bg-rose-100 text-rose-800 border-rose-200 animate-pulse'
                             }`}>
                               {ped.estado_pago === 'pagado' ? 'PAGADO' : 'POR PAGAR'}
@@ -551,9 +569,9 @@ export function InventoryManager() {
                           <button
                             onClick={() => {
                               completeMockPedido(ped.id);
-                              alert('Mercadería recibida. Se actualizó el stock físico del inventario.');
+                              addToast('Mercadería recibida. Stock físico actualizado.', 'success');
                             }}
-                            className="flex-1 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-[9px] uppercase tracking-wider transition-all cursor-pointer shadow-sm"
+                            className="flex-1 py-2 rounded-xl bg-orange-600 hover:bg-orange-700 text-white font-black text-[9px] uppercase tracking-wider transition-all cursor-pointer shadow-sm"
                           >
                             Recibir Mercadería ✓
                           </button>
@@ -606,7 +624,7 @@ export function InventoryManager() {
                       <td className="py-3.5 font-sans font-bold text-slate-800">{prov.nombre}</td>
                       <td className="py-3.5 text-xs text-slate-500">{prov.ruc}</td>
                       <td className="py-3.5 text-xs text-slate-500">{prov.telefono}</td>
-                      <td className="py-3.5 font-sans text-xs text-teal-700 font-extrabold uppercase">{prov.dia_visita}</td>
+                      <td className="py-3.5 font-sans text-xs text-amber-700 font-extrabold uppercase">{prov.dia_visita}</td>
                       <td className="py-3.5 text-center flex items-center justify-center gap-1.5">
                         <button
                           onClick={() => handleEditProveedorClick(prov)}
@@ -615,8 +633,8 @@ export function InventoryManager() {
                           Editar
                         </button>
                         <button
-                          onClick={() => {
-                            if (window.confirm('¿Eliminás este proveedor? Se desvinculará de los productos asociados.')) {
+                          onClick={async () => {
+                            if (await requestConfirm('¿Está seguro que desea eliminar este proveedor? Se desvinculará de los productos asociados.', 'cancel')) {
                               eliminarMockProveedor(prov.id);
                             }
                           }}
@@ -633,7 +651,249 @@ export function InventoryManager() {
           </div>
         )}
 
+        {/* -------------------------------------------------------------------------
+            CONTENIDO PESTAÑA: REPORTES DE CIERRE DIARIO (AUDITORÍA)
+            ------------------------------------------------------------------------- */}
+        {activeTab === 'cierres' && (
+          <div className="flex-1 overflow-hidden bg-white rounded-3xl border border-slate-200/80 p-5 shadow-sm flex flex-col animate-in fade-in duration-300">
+            <h2 className="text-sm font-bold text-slate-700 mb-4 flex justify-between items-center">
+              <span>Historial de Cierres Diarios y Arqueo Financiero</span>
+              <span className="text-xs bg-slate-100 text-slate-600 border border-slate-200/50 px-2.5 py-0.5 rounded-full font-black">
+                {historialCierres.length} Cierres
+              </span>
+            </h2>
+
+            <div className="flex-1 overflow-y-auto pr-1">
+              {historialCierres.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-20 text-center text-slate-400">
+                  <svg className="h-10 w-10 mb-2 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                  <p className="text-xs font-bold uppercase tracking-wider text-slate-500">No hay registros de cierres guardados</p>
+                  <p className="text-[11px] text-slate-400 mt-1">Cuando ejecutes el Cierre Diario [F10] en la caja, el reporte auditable aparecerá acá al instante.</p>
+                </div>
+              ) : (
+                <table className="w-full border-collapse text-left text-sm text-slate-600">
+                  <thead>
+                    <tr className="border-b border-slate-100 text-xs font-bold uppercase tracking-wider text-slate-400">
+                      <th className="pb-3 font-extrabold">Fecha y Horas</th>
+                      <th className="pb-3 text-right font-extrabold">Fondo Apertura</th>
+                      <th className="pb-3 text-right font-extrabold">Ventas (Efe/Bill)</th>
+                      <th className="pb-3 text-right font-extrabold">Egresos</th>
+                      <th className="pb-3 text-right font-extrabold">Efe. Esperado</th>
+                      <th className="pb-3 text-right font-extrabold">Efe. Real Declarado</th>
+                      <th className="pb-3 text-right font-extrabold">Desviación</th>
+                      <th className="pb-3 text-right font-extrabold">Total Neto Recaudado</th>
+                      <th className="pb-3 text-center font-extrabold">Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100 font-mono">
+                    {historialCierres.map((cierre) => {
+                      const tieneDesviacion = Math.abs(cierre.desviacion) > 0.01;
+                      const esNegativa = cierre.desviacion < -0.01;
+                      const esPositiva = cierre.desviacion > 0.01;
+
+                      return (
+                        <tr key={cierre.id} className="hover:bg-slate-50 transition-colors">
+                          <td className="py-3.5 font-sans text-xs">
+                            <span className="font-bold text-slate-800 block">
+                              📅 {new Date(cierre.fechaApertura).toLocaleDateString()}
+                            </span>
+                            <span className="text-[10px] text-slate-400 block mt-0.5">
+                              🕒 Apertura: {new Date(cierre.fechaApertura).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                            </span>
+                            <span className="text-[10px] text-slate-400 block">
+                              🕒 Cierre: {new Date(cierre.fechaCierre).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                            </span>
+                          </td>
+                          <td className="py-3.5 text-right text-slate-600">S/ {cierre.montoApertura.toFixed(2)}</td>
+                          <td className="py-3.5 text-right text-slate-600">
+                            <span className="block font-bold text-slate-800">S/ {(cierre.ventasEfectivo + cierre.ventasBilletera).toFixed(2)}</span>
+                            <span className="block text-[9px] text-slate-400">💵 Efe: S/ {cierre.ventasEfectivo.toFixed(2)}</span>
+                            <span className="block text-[9px] text-orange-600">📱 Bill: S/ {cierre.ventasBilletera.toFixed(2)}</span>
+                          </td>
+                          <td className="py-3.5 text-right text-rose-600 font-semibold">
+                            S/ {(cierre.egresosEfectivo + cierre.egresosBilletera).toFixed(2)}
+                            {cierre.egresosEfectivo > 0 && <span className="block text-[9px] text-rose-400">💵 Efe: S/ {cierre.egresosEfectivo.toFixed(2)}</span>}
+                            {cierre.egresosBilletera > 0 && <span className="block text-[9px] text-rose-400">📱 Bill: S/ {cierre.egresosBilletera.toFixed(2)}</span>}
+                          </td>
+                          <td className="py-3.5 text-right text-slate-700 font-bold">S/ {cierre.saldoFinalEfectivo.toFixed(2)}</td>
+                          <td className="py-3.5 text-right text-indigo-900 font-black">S/ {cierre.efectivoDeclarado.toFixed(2)}</td>
+                          <td className="py-3.5 text-right font-black">
+                            {!tieneDesviacion ? (
+                              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[9px] font-black bg-orange-50 text-orange-700 border border-orange-200">
+                                S/ 0.00 ✓ (Cuadrado)
+                              </span>
+                            ) : esNegativa ? (
+                              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[9px] font-black bg-rose-50 text-rose-700 border border-rose-200 animate-pulse">
+                                S/ {cierre.desviacion.toFixed(2)} ⚠️ (Faltante)
+                              </span>
+                            ) : (
+                              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[9px] font-black bg-amber-50 text-amber-700 border border-amber-200">
+                                +S/ {cierre.desviacion.toFixed(2)} 💰 (Sobrante)
+                              </span>
+                            )}
+                          </td>
+                          <td className="py-3.5 text-right text-slate-800 font-black text-sm">
+                            S/ {cierre.totalNeto.toFixed(2)}
+                          </td>
+                          <td className="py-3.5 text-center">
+                            <button
+                              onClick={() => setSelectedAuditCierre(cierre)}
+                              className="px-4 py-2 text-[10px] rounded-xl border border-slate-200 bg-white hover:bg-slate-50 font-black text-slate-600 uppercase tracking-wider transition-all cursor-pointer shadow-sm hover:border-slate-300"
+                            >
+                              📄 Detalles
+                            </button>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              )}
+            </div>
+          </div>
+        )}
+
       </div>
+
+
+      {/* =========================================================================
+         MODAL DE AUDITORÍA FINANCIERA (REPORTES DE CIERRE)
+         ========================================================================= */}
+      {selectedAuditCierre && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
+          <div className="w-full max-w-2xl rounded-3xl border border-slate-200 bg-white overflow-hidden shadow-2xl animate-in zoom-in-95 duration-200 flex flex-col max-h-[90vh]">
+            
+            {/* Header del Modal */}
+            <div className="bg-slate-50 p-6 border-b border-slate-200 flex justify-between items-start">
+              <div>
+                <h2 className="text-xl font-black text-slate-800 tracking-tight flex items-center gap-2">
+                  <span className="text-2xl">📄</span> Auditoría Detallada de Caja
+                </h2>
+                <div className="mt-2 flex items-center gap-4 text-xs font-semibold text-slate-500">
+                  <span className="bg-white px-2 py-1 rounded-lg border border-slate-200 shadow-sm font-mono">
+                    ID: {selectedAuditCierre.cajaId || 'N/A'}
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <svg className="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                    Apertura: {new Date(selectedAuditCierre.fechaApertura).toLocaleString()}
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <svg className="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    Cierre: {new Date(selectedAuditCierre.fechaCierre).toLocaleString()}
+                  </span>
+                </div>
+              </div>
+              <button 
+                onClick={() => setSelectedAuditCierre(null)}
+                className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-colors"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"/></svg>
+              </button>
+            </div>
+
+            {/* Contenido Scrolleable */}
+            <div className="p-6 overflow-y-auto flex flex-col gap-6 bg-slate-50/50">
+              
+              <div className="grid grid-cols-2 gap-4">
+                {/* Panel Efectivo */}
+                <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
+                  <h3 className="text-xs font-black text-slate-400 uppercase tracking-wider mb-4 flex items-center gap-2">
+                    💵 Contabilidad de Efectivo
+                  </h3>
+                  
+                  <div className="space-y-3 text-sm font-medium text-slate-600">
+                    <div className="flex justify-between items-center">
+                      <span>(+) Fondo Fijo Apertura</span>
+                      <span className="font-mono font-bold text-slate-800">S/ {selectedAuditCierre.montoApertura.toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span>(+) Ventas Efectivo</span>
+                      <span className="font-mono font-bold text-slate-800">S/ {selectedAuditCierre.ventasEfectivo.toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between items-center text-rose-600">
+                      <span>(-) Egresos Efectivo</span>
+                      <span className="font-mono font-bold">S/ {selectedAuditCierre.egresosEfectivo.toFixed(2)}</span>
+                    </div>
+                    
+                    <div className="pt-3 mt-3 border-t border-dashed border-slate-200">
+                      <div className="flex justify-between items-center">
+                        <span className="text-slate-500 font-bold">Efectivo Esperado (Sistema)</span>
+                        <span className="font-mono font-black text-slate-800 text-base">S/ {selectedAuditCierre.saldoFinalEfectivo.toFixed(2)}</span>
+                      </div>
+                      <div className="flex justify-between items-center mt-2">
+                        <span className="text-slate-500 font-bold">Efectivo Real Declarado</span>
+                        <span className="font-mono font-black text-indigo-700 text-base">S/ {selectedAuditCierre.efectivoDeclarado.toFixed(2)}</span>
+                      </div>
+                    </div>
+
+                    <div className={`pt-3 mt-3 border-t border-slate-200 flex justify-between items-center rounded-xl p-3 ${Math.abs(selectedAuditCierre.desviacion) < 0.01 ? 'bg-orange-50 text-orange-800 border-orange-100' : selectedAuditCierre.desviacion < 0 ? 'bg-rose-50 text-rose-800 border-rose-100' : 'bg-amber-50 text-amber-800 border-amber-100'}`}>
+                      <span className="font-black uppercase tracking-wider text-xs">
+                        {Math.abs(selectedAuditCierre.desviacion) < 0.01 ? '✓ Cuadre Perfecto' : selectedAuditCierre.desviacion < 0 ? '⚠️ Faltante Detectado' : '💰 Sobrante Detectado'}
+                      </span>
+                      <span className="font-mono font-black text-lg">
+                        S/ {selectedAuditCierre.desviacion.toFixed(2)}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Panel Billeteras */}
+                <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
+                  <h3 className="text-xs font-black text-slate-400 uppercase tracking-wider mb-4 flex items-center gap-2">
+                    📱 Billeteras Digitales
+                  </h3>
+                  
+                  {Object.keys(selectedAuditCierre.saldoFinalBilleteras).length === 0 ? (
+                    <div className="h-full flex flex-col items-center justify-center text-slate-400 gap-2 pb-8">
+                      <svg className="w-8 h-8 opacity-20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+                      <span className="text-xs font-semibold">Sin movimientos digitales</span>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      {Object.entries(selectedAuditCierre.saldoFinalBilleteras).map(([nombre, saldo]) => (
+                        <div key={nombre} className="flex justify-between items-center p-3 bg-slate-50 rounded-xl border border-slate-100">
+                          <span className="font-bold text-slate-700 flex items-center gap-2">
+                            <span className="w-2 h-2 rounded-full bg-orange-500"></span>
+                            {nombre}
+                          </span>
+                          <span className="font-mono font-black text-orange-700">S/ {saldo.toFixed(2)}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+            </div>
+
+            {/* Footer */}
+            <div className="bg-white p-6 border-t border-slate-200 flex justify-between items-center">
+              <div>
+                <span className="text-[10px] font-black text-slate-400 uppercase tracking-wider block">Total Neto Recaudado (Efectivo + Digital)</span>
+                <span className="font-mono font-black text-3xl text-slate-800">S/ {selectedAuditCierre.totalNeto.toFixed(2)}</span>
+              </div>
+              <div className="flex gap-3">
+                <button 
+                  onClick={() => window.print()}
+                  className="px-6 py-3 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 font-black text-slate-600 uppercase tracking-wider transition-all shadow-sm flex items-center gap-2"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+                  Imprimir
+                </button>
+                <button 
+                  onClick={() => setSelectedAuditCierre(null)}
+                  className="px-6 py-3 rounded-xl bg-slate-900 text-white hover:bg-slate-800 font-black uppercase tracking-wider transition-all shadow-md"
+                >
+                  Cerrar
+                </button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      )}
 
       {/* Columna Derecha: Formulario Contextual */}
       <div className="w-[420px] flex flex-col gap-5 overflow-hidden flex-shrink-0">
@@ -652,7 +912,7 @@ export function InventoryManager() {
             </div>
             <div className="p-3 bg-slate-50 rounded-2xl border border-slate-200/50 flex flex-col">
               <span className="text-[9px] text-slate-400 font-bold uppercase">Billeteras</span>
-              <span className="text-lg font-black font-mono text-emerald-600 mt-1">S/ {cuentasBilletera.reduce((sum, c) => sum + c.saldo, 0).toFixed(2)}</span>
+              <span className="text-lg font-black font-mono text-orange-600 mt-1">S/ {cuentasBilletera.reduce((sum, c) => sum + c.saldo, 0).toFixed(2)}</span>
             </div>
             <div className="p-3 bg-rose-50 rounded-2xl border border-rose-100 flex flex-col col-span-2 shadow-inner">
               <div className="flex justify-between items-center">
@@ -682,7 +942,7 @@ export function InventoryManager() {
                   value={nombre}
                   onChange={(e) => setNombre(e.target.value)}
                   placeholder="Ej. Chocolate Sublime Extragrande"
-                  className="w-full rounded-xl border border-slate-200 bg-slate-50 py-2.5 px-3 text-xs font-bold text-slate-800 placeholder-slate-400 focus:outline-none focus:border-emerald-500 focus:bg-white transition-all shadow-sm"
+                  className="w-full rounded-xl border border-slate-200 bg-slate-50 py-2.5 px-3 text-xs font-bold text-slate-800 placeholder-slate-400 focus:outline-none focus:border-orange-500 focus:bg-white transition-all shadow-sm"
                 />
               </div>
 
@@ -694,7 +954,7 @@ export function InventoryManager() {
                   value={codigo}
                   onChange={(e) => setCodigo(e.target.value)}
                   placeholder="Escribir o escanear código..."
-                  className="w-full rounded-xl border border-slate-200 bg-slate-50 py-2.5 px-3 text-xs font-bold text-slate-800 placeholder-slate-400 focus:outline-none focus:border-emerald-500 focus:bg-white transition-all shadow-sm font-mono"
+                  className="w-full rounded-xl border border-slate-200 bg-slate-50 py-2.5 px-3 text-xs font-bold text-slate-800 placeholder-slate-400 focus:outline-none focus:border-orange-500 focus:bg-white transition-all shadow-sm font-mono"
                 />
               </div>
 
@@ -709,7 +969,7 @@ export function InventoryManager() {
                     value={precioCosto}
                     onChange={(e) => handleCostoChange(e.target.value)}
                     placeholder="0.00"
-                    className="w-full rounded-xl border border-slate-200 bg-slate-50 py-2.5 px-3 text-xs font-bold text-slate-800 focus:outline-none focus:border-emerald-500 focus:bg-white transition-all shadow-sm font-mono"
+                    className="w-full rounded-xl border border-slate-200 bg-slate-50 py-2.5 px-3 text-xs font-bold text-slate-800 focus:outline-none focus:border-orange-500 focus:bg-white transition-all shadow-sm font-mono"
                   />
                 </div>
 
@@ -722,7 +982,7 @@ export function InventoryManager() {
                     value={margenGanancia}
                     onChange={(e) => handleMargenChange(e.target.value)}
                     placeholder="30"
-                    className="w-full rounded-xl border border-slate-200 bg-slate-50 py-2.5 px-3 text-xs font-bold text-slate-800 focus:outline-none focus:border-emerald-500 focus:bg-white transition-all shadow-sm font-mono"
+                    className="w-full rounded-xl border border-slate-200 bg-slate-50 py-2.5 px-3 text-xs font-bold text-slate-800 focus:outline-none focus:border-orange-500 focus:bg-white transition-all shadow-sm font-mono"
                   />
                 </div>
 
@@ -735,7 +995,7 @@ export function InventoryManager() {
                     value={precioVenta}
                     onChange={(e) => handleVentaChange(e.target.value)}
                     placeholder="0.00"
-                    className="w-full rounded-xl border border-slate-200 bg-slate-50 py-2.5 px-3 text-xs font-bold text-slate-800 focus:outline-none focus:border-emerald-500 focus:bg-white transition-all shadow-sm font-mono"
+                    className="w-full rounded-xl border border-slate-200 bg-slate-50 py-2.5 px-3 text-xs font-bold text-slate-800 focus:outline-none focus:border-orange-500 focus:bg-white transition-all shadow-sm font-mono"
                   />
                 </div>
               </div>
@@ -749,7 +1009,7 @@ export function InventoryManager() {
                     value={stock}
                     onChange={(e) => setStock(e.target.value)}
                     placeholder="0"
-                    className="w-full rounded-xl border border-slate-200 bg-slate-50 py-2.5 px-3 text-xs font-bold text-slate-800 focus:outline-none focus:border-emerald-500 focus:bg-white transition-all shadow-sm font-mono"
+                    className="w-full rounded-xl border border-slate-200 bg-slate-50 py-2.5 px-3 text-xs font-bold text-slate-800 focus:outline-none focus:border-orange-500 focus:bg-white transition-all shadow-sm font-mono"
                   />
                 </div>
 
@@ -758,7 +1018,7 @@ export function InventoryManager() {
                   <select
                     value={proveedorId}
                     onChange={(e) => setProveedorId(e.target.value)}
-                    className="w-full rounded-xl border border-slate-200 bg-slate-50 py-2.5 px-3 text-xs font-bold text-slate-700 focus:border-emerald-500 focus:bg-white transition-all outline-none shadow-sm cursor-pointer"
+                    className="w-full rounded-xl border border-slate-200 bg-slate-50 py-2.5 px-3 text-xs font-bold text-slate-700 focus:border-orange-500 focus:bg-white transition-all outline-none shadow-sm cursor-pointer"
                   >
                     <option value="">Seleccionar...</option>
                     {mockProveedores.map((p) => (
@@ -785,7 +1045,7 @@ export function InventoryManager() {
                     w-full py-3 rounded-xl font-black text-xs uppercase tracking-wider transition-all cursor-pointer
                     ${duplicadoDetectado.existe
                       ? 'bg-slate-100 text-slate-400 cursor-not-allowed border border-slate-200/50'
-                      : 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white hover:brightness-105 active:scale-95 shadow-md shadow-emerald-600/10'
+                      : 'bg-gradient-to-r from-orange-600 to-amber-600 text-white hover:brightness-105 active:scale-95 shadow-md shadow-orange-600/10'
                     }
                   `}
                 >
@@ -814,7 +1074,7 @@ export function InventoryManager() {
                   value={provNombre}
                   onChange={(e) => setProvNombre(e.target.value)}
                   placeholder="Ej. Distribuidora San Ignacio S.A.C."
-                  className="w-full rounded-xl border border-slate-200 bg-slate-50 py-2.5 px-3 text-xs font-bold text-slate-800 focus:outline-none focus:border-emerald-500 focus:bg-white transition-all shadow-sm"
+                  className="w-full rounded-xl border border-slate-200 bg-slate-50 py-2.5 px-3 text-xs font-bold text-slate-800 focus:outline-none focus:border-orange-500 focus:bg-white transition-all shadow-sm"
                 />
               </div>
 
@@ -826,7 +1086,7 @@ export function InventoryManager() {
                   value={provRuc}
                   onChange={(e) => setProvRuc(e.target.value)}
                   placeholder="Ej. 20546789123"
-                  className="w-full rounded-xl border border-slate-200 bg-slate-50 py-2.5 px-3 text-xs font-bold text-slate-800 focus:outline-none focus:border-emerald-500 focus:bg-white transition-all shadow-sm font-mono"
+                  className="w-full rounded-xl border border-slate-200 bg-slate-50 py-2.5 px-3 text-xs font-bold text-slate-800 focus:outline-none focus:border-orange-500 focus:bg-white transition-all shadow-sm font-mono"
                 />
               </div>
 
@@ -837,7 +1097,7 @@ export function InventoryManager() {
                   value={provTelefono}
                   onChange={(e) => setProvTelefono(e.target.value)}
                   placeholder="Ej. 987654321"
-                  className="w-full rounded-xl border border-slate-200 bg-slate-50 py-2.5 px-3 text-xs font-bold text-slate-800 focus:outline-none focus:border-emerald-500 focus:bg-white transition-all shadow-sm font-mono"
+                  className="w-full rounded-xl border border-slate-200 bg-slate-50 py-2.5 px-3 text-xs font-bold text-slate-800 focus:outline-none focus:border-orange-500 focus:bg-white transition-all shadow-sm font-mono"
                 />
               </div>
 
@@ -846,7 +1106,7 @@ export function InventoryManager() {
                 <select
                   value={provDiaVisita}
                   onChange={(e) => setProvDiaVisita(e.target.value)}
-                  className="w-full rounded-xl border border-slate-200 bg-slate-50 py-2.5 px-3 text-xs font-bold text-slate-700 focus:border-emerald-500 focus:bg-white transition-all outline-none shadow-sm cursor-pointer"
+                  className="w-full rounded-xl border border-slate-200 bg-slate-50 py-2.5 px-3 text-xs font-bold text-slate-700 focus:border-orange-500 focus:bg-white transition-all outline-none shadow-sm cursor-pointer"
                 >
                   <option value="Lunes">Lunes</option>
                   <option value="Martes">Martes</option>
@@ -870,7 +1130,7 @@ export function InventoryManager() {
                 )}
                 <button
                   type="submit"
-                  className="w-full py-3 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-black text-xs uppercase tracking-wider hover:brightness-105 active:scale-95 shadow-md shadow-emerald-600/10 cursor-pointer"
+                  className="w-full py-3 rounded-xl bg-gradient-to-r from-orange-600 to-amber-600 text-white font-black text-xs uppercase tracking-wider hover:brightness-105 active:scale-95 shadow-md shadow-orange-600/10 cursor-pointer"
                 >
                   {editingProvId ? 'Actualizar Ficha' : 'Agregar Proveedor'}
                 </button>
@@ -884,13 +1144,46 @@ export function InventoryManager() {
             ------------------------------------------------------------------------- */}
         {activeTab === 'compras' && (
           <div className="rounded-3xl border border-slate-200/80 bg-white p-5 shadow-md flex flex-col gap-3 justify-center items-center h-full text-center">
-            <svg className="h-10 w-10 text-emerald-600/80 mb-2 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="h-10 w-10 text-orange-600/80 mb-2 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
             <h3 className="text-xs font-black text-slate-800 uppercase tracking-wider">Flujo de Caja Digital</h3>
             <p className="text-[11px] text-slate-400 font-semibold px-4 leading-relaxed">
               Toda egresión física o transferencia digital a proveedores disminuye de forma atómica tus balances generales. Sincronización instantánea con arqueo de Caja en vivo.
             </p>
+          </div>
+        )}
+
+        {/* -------------------------------------------------------------------------
+            PANEL INFORMACIÓN CONTEXTUAL 4: REPORTES DE CIERRE
+            ------------------------------------------------------------------------- */}
+        {activeTab === 'cierres' && (
+          <div className="rounded-3xl border border-slate-200/80 bg-white p-5 shadow-md flex flex-col gap-4 justify-center items-center h-full text-center animate-in fade-in duration-300">
+            <svg className="h-10 w-10 text-amber-600/80 mb-1.5 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+            </svg>
+            <h3 className="text-xs font-black text-slate-800 uppercase tracking-wider">Trazabilidad Total</h3>
+            <p className="text-[11px] text-slate-400 font-semibold px-4 leading-relaxed">
+              El cuadre de caja compara en tiempo real el efectivo en cajón esperado con el declarado por el cajero, registrando discrepancias. El reporte desglosa los cierres de billeteras digitales (Yape, Plin) de forma transparente para auditorías rápidas.
+            </p>
+            <div className="w-full bg-slate-50 border border-slate-200/60 rounded-2xl p-4 mt-2 flex flex-col gap-2.5 text-left text-xs font-sans">
+              <div className="flex justify-between items-center font-bold text-slate-700">
+                <span>Historial Recaudación Total:</span>
+                <span className="font-mono text-orange-600 font-black">
+                  S/ {historialCierres.reduce((sum, c) => sum + c.totalNeto, 0).toFixed(2)}
+                </span>
+              </div>
+              <div className="flex justify-between items-center font-bold text-slate-700 border-t border-slate-200/50 pt-2">
+                <span>Desviación Total Acumulada:</span>
+                <span className={`font-mono font-black ${
+                  historialCierres.reduce((sum, c) => sum + c.desviacion, 0) < -0.01 
+                    ? 'text-rose-600' 
+                    : 'text-orange-600'
+                }`}>
+                  S/ {historialCierres.reduce((sum, c) => sum + c.desviacion, 0).toFixed(2)}
+                </span>
+              </div>
+            </div>
           </div>
         )}
 
@@ -937,12 +1230,12 @@ export function InventoryManager() {
                   value={stockAConsolidar}
                   onChange={(e) => setStockAConsolidar(e.target.value)}
                   placeholder="Sumar cantidad. Ej. 12"
-                  className="w-1/2 rounded-xl border border-slate-200 bg-white py-2 px-3 text-xs font-bold text-slate-800 placeholder-slate-400 focus:outline-none focus:border-emerald-500"
+                  className="w-1/2 rounded-xl border border-slate-200 bg-white py-2 px-3 text-xs font-bold text-slate-800 placeholder-slate-400 focus:outline-none focus:border-orange-500"
                 />
                 <button
                   type="button"
                   onClick={handleConsolidarStock}
-                  className="w-1/2 bg-emerald-600 hover:bg-emerald-700 py-2.5 rounded-xl font-black text-white text-[10px] uppercase tracking-wider transition-all cursor-pointer shadow-sm shadow-emerald-600/10"
+                  className="w-1/2 bg-orange-600 hover:bg-orange-700 py-2.5 rounded-xl font-black text-white text-[10px] uppercase tracking-wider transition-all cursor-pointer shadow-sm shadow-orange-600/10"
                 >
                   Sumar y Fusionar Stock
                 </button>

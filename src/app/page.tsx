@@ -7,7 +7,7 @@ const CashRegister = dynamic(() => import('@/components/pos/CashRegister'), {
   loading: () => (
     <div className="flex h-screen items-center justify-center bg-slate-50 text-slate-800">
       <div className="flex flex-col items-center gap-4">
-        <div className="h-10 w-10 animate-spin rounded-full border-4 border-emerald-600 border-t-transparent"></div>
+        <div className="h-10 w-10 animate-spin rounded-full border-4 border-orange-600 border-t-transparent"></div>
         <p className="font-sans text-sm text-slate-600 font-semibold">Iniciando Terminal BOOM POS...</p>
       </div>
     </div>

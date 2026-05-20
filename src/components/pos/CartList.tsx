@@ -29,7 +29,7 @@ export function CartList() {
         </div>
         <h3 className="font-extrabold text-slate-700">El carrito está vacío</h3>
         <p className="mt-1 text-xs text-slate-500">
-          Escaneá un código o presioná <span className="font-mono text-emerald-600 font-extrabold">F8</span> para agregar productos.
+          Escaneá un código o presioná <span className="font-mono text-orange-600 font-extrabold">F8</span> para agregar productos.
         </p>
       </div>
     );
@@ -62,14 +62,14 @@ export function CartList() {
               ${isBelowCosto 
                 ? 'border-rose-200 bg-rose-50/50' 
                 : isSelected
-                  ? 'border-emerald-500 bg-emerald-50/20 shadow-[0_4px_20px_-3px_rgba(16,185,129,0.15)] ring-1 ring-emerald-500/20 scale-[1.01]'
+                  ? 'border-orange-500 bg-orange-50/20 shadow-[0_4px_20px_-3px_rgba(16,185,129,0.15)] ring-1 ring-orange-500/20 scale-[1.01]'
                   : 'border-slate-200/80 bg-white hover:border-slate-300 hover:shadow'
               }
             `}
           >
             {/* Badge de Selección por Teclado */}
             {isSelected && (
-              <span className="absolute -top-2.5 right-4 bg-emerald-600 text-white font-mono text-[9px] font-black tracking-wider uppercase px-2.5 py-0.5 rounded-full shadow-md animate-in slide-in-from-top-1">
+              <span className="absolute -top-2.5 right-4 bg-orange-600 text-white font-mono text-[9px] font-black tracking-wider uppercase px-2.5 py-0.5 rounded-full shadow-md animate-in slide-in-from-top-1">
                 Foco Atajos [ + | - | Supr ]
               </span>
             )}
@@ -133,11 +133,11 @@ export function CartList() {
                 </div>
                 <div className="flex items-center justify-end gap-2 mt-0.5">
                   {item.descuento > 0 && (
-                    <span className="text-[10px] text-emerald-700 bg-emerald-100/80 px-1.5 py-0.5 rounded font-black border border-emerald-200/40">
+                    <span className="text-[10px] text-orange-700 bg-orange-100/80 px-1.5 py-0.5 rounded font-black border border-orange-200/40">
                       -S/ {itemDescuento.toFixed(2)}
                     </span>
                   )}
-                  <span className={`font-mono text-base font-black ${isBelowCosto ? 'text-rose-600 animate-pulse' : 'text-emerald-600'}`}>
+                  <span className={`font-mono text-base font-black ${isBelowCosto ? 'text-rose-600 animate-pulse' : 'text-orange-600'}`}>
                     S/ {itemTotalFinal.toFixed(2)}
                   </span>
                 </div>
@@ -159,7 +159,7 @@ export function CartList() {
                         onClick={() => updateDiscount(item.id, item.descuento, 'porcentaje')}
                         className={`px-2 py-0.5 rounded text-[10px] transition-all cursor-pointer ${
                           item.tipo_descuento === 'porcentaje' 
-                            ? 'bg-emerald-600 text-white font-black shadow-sm' 
+                            ? 'bg-orange-600 text-white font-black shadow-sm' 
                             : 'text-slate-600 hover:text-slate-900 font-semibold'
                         }`}
                       >
@@ -169,7 +169,7 @@ export function CartList() {
                         onClick={() => updateDiscount(item.id, item.descuento, 'monto')}
                         className={`px-2 py-0.5 rounded text-[10px] transition-all cursor-pointer ${
                           item.tipo_descuento === 'monto' 
-                            ? 'bg-emerald-600 text-white font-black shadow-sm' 
+                            ? 'bg-orange-600 text-white font-black shadow-sm' 
                             : 'text-slate-600 hover:text-slate-900 font-semibold'
                         }`}
                       >
@@ -183,7 +183,7 @@ export function CartList() {
                     value={item.descuento || ''}
                     onChange={(e) => updateDiscount(item.id, Number(e.target.value) || 0, item.tipo_descuento)}
                     placeholder="0"
-                    className="w-16 rounded-lg border border-slate-300 bg-white px-2 py-1 text-right font-mono text-xs text-slate-800 placeholder-slate-400 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
+                    className="w-16 rounded-lg border border-slate-300 bg-white px-2 py-1 text-right font-mono text-xs text-slate-800 placeholder-slate-400 focus:border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-500/20"
                   />
                 </div>
 
@@ -195,7 +195,7 @@ export function CartList() {
                     value={item.nota || ''}
                     onChange={(e) => updateNote(item.id, e.target.value)}
                     placeholder="Escribir comentario..."
-                    className="flex-1 rounded-lg border border-slate-300 bg-white px-2.5 py-1 text-xs text-slate-700 placeholder-slate-400 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
+                    className="flex-1 rounded-lg border border-slate-300 bg-white px-2.5 py-1 text-xs text-slate-700 placeholder-slate-400 focus:border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-500/20"
                   />
                 </div>
 

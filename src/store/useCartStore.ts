@@ -23,6 +23,8 @@ export interface Cliente {
 export interface TabState {
   items: CartItem[];
   cliente: Cliente | null;
+  undoStack?: CartItem[][];
+  redoStack?: CartItem[][];
 }
 
 export interface MockProduct {
@@ -77,6 +79,23 @@ export interface CuentaBilletera {
   saldo: number;
 }
 
+export interface CierreDiario {
+  id: string;
+  cajaId: string;
+  fechaApertura: string;
+  fechaCierre: string;
+  montoApertura: number;
+  ventasEfectivo: number;
+  ventasBilletera: number;
+  egresosEfectivo: number;
+  egresosBilletera: number;
+  saldoFinalEfectivo: number;
+  saldoFinalBilleteras: Record<string, number>;
+  efectivoDeclarado: number;
+  desviacion: number;
+  totalNeto: number;
+}
+
 interface CartStore {
   tabs: TabState[];
   activeTabIndex: number;
@@ -89,12 +108,14 @@ interface CartStore {
   setCajaActivaId: (id: string | null) => void;
   setActiveTab: (index: number) => void;
   setSelectedCartItemIndex: (index: number) => void;
-  addToCart: (product: Omit<CartItem, 'cantidad' | 'descuento' | 'tipo_descuento' | 'nota'>) => void;
+  addToCart: (product: Omit<CartItem, 'cantidad' | 'descuento' | 'tipo_descuento' | 'nota'> & { cantidad?: number }) => void;
   removeFromCart: (itemId: string) => void;
   updateQuantity: (itemId: string, qty: number) => void;
   updateDiscount: (itemId: string, discount: number, type: 'porcentaje' | 'monto') => void;
   updateNote: (itemId: string, note: string) => void;
   clearActiveTab: () => void;
+  undoClearActiveTab: () => void;
+  redoClearActiveTab: () => void;
   getActiveTabTotal: () => { subtotal: number; descuentoTotal: number; total: number };
 
   // Local/Mock Database Store (Demo Mode)
@@ -103,6 +124,7 @@ interface CartStore {
   mockMovimientos: MockMovimiento[];
   mockProveedores: MockProveedor[];
   cuentasBilletera: CuentaBilletera[];
+  historialCierres: CierreDiario[];
 
   addMockProduct: (prod: Omit<MockProduct, 'id'> & { id?: string }) => { success: boolean; error?: string };
   updateMockProduct: (prod: MockProduct) => { success: boolean; error?: string };
@@ -117,14 +139,18 @@ interface CartStore {
   agregarMockProveedor: (prov: Omit<MockProveedor, 'id'>) => void;
   eliminarMockProveedor: (id: string) => void;
   actualizarMockProveedor: (prov: MockProveedor) => void;
+  
+  // Acciones de Apertura/Cierre Diario
+  abrirCajaDiaria: (montoApertura: number) => { success: boolean; data?: { cajaId: string } };
+  cerrarCajaDiaria: (efectivoDeclarado: number) => { success: boolean; data?: CierreDiario; error?: string };
 }
 
 const INITIAL_TABS: TabState[] = [
-  { items: [], cliente: null },
-  { items: [], cliente: null },
-  { items: [], cliente: null },
-  { items: [], cliente: null },
-  { items: [], cliente: null },
+  { items: [], cliente: null, undoStack: [], redoStack: [] },
+  { items: [], cliente: null, undoStack: [], redoStack: [] },
+  { items: [], cliente: null, undoStack: [], redoStack: [] },
+  { items: [], cliente: null, undoStack: [], redoStack: [] },
+  { items: [], cliente: null, undoStack: [], redoStack: [] },
 ];
 
 const INITIAL_MOCK_PRODUCTS: MockProduct[] = [
@@ -156,13 +182,14 @@ export const useCartStore = create<CartStore>()(
       modo: 'rapido',
       cajaActivaId: null,
       selectedCartItemIndex: -1,
-
+      
       // Local Mock DB Lists
       mockProducts: INITIAL_MOCK_PRODUCTS,
       mockPedidos: [],
       mockMovimientos: [],
       mockProveedores: INITIAL_MOCK_PROVIDERS,
       cuentasBilletera: INITIAL_CUENTAS_BILLETERA,
+      historialCierres: [],
 
       setModo: (modo) => set({ modo }),
       
@@ -175,25 +202,29 @@ export const useCartStore = create<CartStore>()(
       addToCart: (product) => set((state) => {
         const newTabs = [...state.tabs];
         const activeTab = { ...newTabs[state.activeTabIndex] };
+        
+        // Soporte para códigos repetidos pero con diferentes cantidades/pesos
         const existingItemIndex = activeTab.items.findIndex((item) => item.id === product.id);
+        const cantidadAAgregar = Number(product.cantidad) || 1;
 
         if (existingItemIndex > -1) {
-          const updatedItems = [...activeTab.items];
-          updatedItems[existingItemIndex] = {
-            ...updatedItems[existingItemIndex],
-            cantidad: updatedItems[existingItemIndex].cantidad + 1,
+          const updatedItem = {
+            ...activeTab.items[existingItemIndex],
+            cantidad: Number((activeTab.items[existingItemIndex].cantidad + cantidadAAgregar).toFixed(3)),
           };
-          activeTab.items = updatedItems;
+          const newItems = [...activeTab.items];
+          newItems.splice(existingItemIndex, 1);
+          activeTab.items = [updatedItem, ...newItems];
         } else {
           activeTab.items = [
-            ...activeTab.items,
             {
               ...product,
-              cantidad: 1,
+              cantidad: cantidadAAgregar,
               descuento: 0,
-              tipo_descuento: 'porcentaje',
+              tipo_descuento: 'porcentaje' as const,
               nota: '',
             },
+            ...activeTab.items,
           ];
         }
 
@@ -250,7 +281,54 @@ export const useCartStore = create<CartStore>()(
 
       clearActiveTab: () => set((state) => {
         const newTabs = [...state.tabs];
-        newTabs[state.activeTabIndex] = { items: [], cliente: null };
+        const currentTab = newTabs[state.activeTabIndex];
+        newTabs[state.activeTabIndex] = { 
+          ...currentTab, 
+          items: [], 
+          cliente: null,
+          undoStack: [...(currentTab.undoStack || []), currentTab.items],
+          redoStack: [] // Clear redo stack on new action
+        };
+        return { tabs: newTabs, selectedCartItemIndex: -1 };
+      }),
+
+      undoClearActiveTab: () => set((state) => {
+        const newTabs = [...state.tabs];
+        const currentTab = newTabs[state.activeTabIndex];
+        const undoStack = currentTab.undoStack || [];
+        
+        if (undoStack.length === 0) return state; // Nothing to undo
+        
+        const previousItems = undoStack[undoStack.length - 1];
+        const newUndoStack = undoStack.slice(0, -1);
+        
+        newTabs[state.activeTabIndex] = {
+          ...currentTab,
+          items: previousItems,
+          undoStack: newUndoStack,
+          redoStack: [...(currentTab.redoStack || []), currentTab.items]
+        };
+        
+        return { tabs: newTabs };
+      }),
+
+      redoClearActiveTab: () => set((state) => {
+        const newTabs = [...state.tabs];
+        const currentTab = newTabs[state.activeTabIndex];
+        const redoStack = currentTab.redoStack || [];
+        
+        if (redoStack.length === 0) return state; // Nothing to redo
+        
+        const nextItems = redoStack[redoStack.length - 1];
+        const newRedoStack = redoStack.slice(0, -1);
+        
+        newTabs[state.activeTabIndex] = {
+          ...currentTab,
+          items: nextItems,
+          undoStack: [...(currentTab.undoStack || []), currentTab.items],
+          redoStack: newRedoStack
+        };
+        
         return { tabs: newTabs };
       }),
 
@@ -525,6 +603,109 @@ export const useCartStore = create<CartStore>()(
       actualizarMockProveedor: (prov) => set((state) => ({
         mockProveedores: state.mockProveedores.map(p => p.id === prov.id ? prov : p)
       })),
+
+      abrirCajaDiaria: (montoApertura) => {
+        const state = get();
+        const newCajaId = 'caja-mock-' + Math.random().toString(36).substring(2, 11);
+        
+        // Resetear billeteras digitales a 0 al abrir una nueva caja
+        const cuentasCero = state.cuentasBilletera.map(c => ({ ...c, saldo: 0 }));
+
+        set({
+          cajaActivaId: newCajaId,
+          cuentasBilletera: cuentasCero,
+        });
+
+        // Registrar movimiento de apertura
+        get().addMockMovimiento({
+          caja_id: newCajaId,
+          tipo: 'apertura',
+          monto: montoApertura,
+          motivo: 'Apertura de caja diaria (Modo Demo)',
+          metodo_pago: 'efectivo',
+          cuenta_id: null
+        });
+
+        return { success: true, data: { cajaId: newCajaId } };
+      },
+
+      cerrarCajaDiaria: (efectivoDeclarado) => {
+        const state = get();
+        if (!state.cajaActivaId) return { success: false, error: 'No hay ninguna caja abierta.' };
+
+        const cajaId = state.cajaActivaId;
+        const movimientos = state.mockMovimientos.filter(m => m.caja_id === cajaId);
+
+        // Calcular flujos
+        const montoApertura = movimientos
+          .filter(m => m.tipo === 'apertura')
+          .reduce((sum, m) => sum + m.monto, 0);
+
+        const ventasEfectivo = movimientos
+          .filter(m => m.tipo === 'ingreso' && m.metodo_pago === 'efectivo')
+          .reduce((sum, m) => sum + m.monto, 0);
+
+        const ventasBilletera = movimientos
+          .filter(m => m.tipo === 'ingreso' && m.metodo_pago === 'billetera_digital')
+          .reduce((sum, m) => sum + m.monto, 0);
+
+        const egresosEfectivo = movimientos
+          .filter(m => m.tipo === 'egreso' && m.metodo_pago === 'efectivo')
+          .reduce((sum, m) => sum + m.monto, 0);
+
+        const egresosBilletera = movimientos
+          .filter(m => m.tipo === 'egreso' && m.metodo_pago === 'billetera_digital')
+          .reduce((sum, m) => sum + m.monto, 0);
+
+        const saldoFinalEfectivo = montoApertura + ventasEfectivo - egresosEfectivo;
+
+        const saldoFinalBilleteras: Record<string, number> = {};
+        state.cuentasBilletera.forEach(c => {
+          saldoFinalBilleteras[c.id] = c.saldo;
+        });
+
+        const totalNeto = saldoFinalEfectivo + Object.values(saldoFinalBilleteras).reduce((sum, s) => sum + s, 0);
+
+        const desviacion = efectivoDeclarado - saldoFinalEfectivo;
+
+        const nuevoCierre: CierreDiario = {
+          id: 'cierre-' + Math.random().toString(36).substring(2, 11),
+          cajaId,
+          fechaApertura: movimientos.find(m => m.tipo === 'apertura')?.fecha || new Date().toISOString(),
+          fechaCierre: new Date().toISOString(),
+          montoApertura,
+          ventasEfectivo,
+          ventasBilletera,
+          egresosEfectivo,
+          egresosBilletera,
+          saldoFinalEfectivo,
+          saldoFinalBilleteras,
+          efectivoDeclarado,
+          desviacion,
+          totalNeto
+        };
+
+        // Agregar movimiento de cierre
+        get().addMockMovimiento({
+          caja_id: cajaId,
+          tipo: 'cierre',
+          monto: efectivoDeclarado,
+          motivo: `Cierre de caja. Declarado: S/ ${efectivoDeclarado.toFixed(2)}. Esperado: S/ ${saldoFinalEfectivo.toFixed(2)}.`,
+          metodo_pago: 'efectivo',
+          cuenta_id: null
+        });
+
+        // Guardar cierre, cerrar caja y vaciar billeteras
+        const cuentasCierreCero = state.cuentasBilletera.map(c => ({ ...c, saldo: 0 }));
+
+        set({
+          cajaActivaId: null,
+          cuentasBilletera: cuentasCierreCero,
+          historialCierres: [nuevoCierre, ...state.historialCierres]
+        });
+
+        return { success: true, data: nuevoCierre };
+      },
     }),
     {
       name: 'boom-pos-cart-storage',
