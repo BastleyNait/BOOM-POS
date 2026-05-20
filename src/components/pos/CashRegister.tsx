@@ -90,6 +90,7 @@ export function CashRegister() {
 
   // Categorías y Productos para el Catálogo Rápido
   const [categoriaActiva, setCategoriaActiva] = useState<string>('Emporio');
+  const [showArqueoModal, setShowArqueoModal] = useState(false);
 
   // Clasificación dinámica de productos para alimentar la grilla rápida
   const clasificarProducto = (nombre: string): string => {
@@ -165,7 +166,7 @@ export function CashRegister() {
         descuento: item.descuento > 0
           ? (item.tipo_descuento === 'porcentaje' ? (item.precio_venta * item.cantidad) * (item.descuento / 100) : item.descuento * item.cantidad)
           : 0,
-        nota: item.nota || null
+        nota: item.nota || undefined,
       }));
 
       const res = await confirmarVentaAction({
@@ -372,15 +373,7 @@ export function CashRegister() {
       <div className="flex flex-1 gap-4 overflow-hidden justify-center">
         
         {/* COLUMNA 1 (IZQUIERDA - OPERATIVA): Buscador, Calculadora Rápida y Carrito */}
-        <div className="flex-1 max-w-[440px] min-w-[320px] flex flex-col gap-3 overflow-hidden">
-          
-          {/* Buscador de código de barras / manual */}
-          <div className="relative">
-            <ProductFinder inputRef={searchInputRef} />
-            <span className="absolute right-4 top-3 text-[9px] font-extrabold bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded border border-slate-200 pointer-events-none">
-              F8
-            </span>
-          </div>
+        <div className="flex-1 max-w-[340px] 2xl:max-w-[440px] min-w-[280px] flex flex-col gap-3 overflow-hidden">
 
           {/* Calculadora Rápida [F7] (Rediseño Ultra-Compacto para maximizar la Canasta) */}
           <div className="bg-white rounded-3xl border border-slate-200/80 p-3 shadow-sm flex flex-col gap-2">
@@ -506,7 +499,17 @@ export function CashRegister() {
         </div>
 
         {/* COLUMNA 2 (CENTRAL - CATÁLOGO): Grilla de Productos Rápidos por Categoría (Se oculta en pantallas angostas/cuadradas para evitar roturas) */}
-        <div className="hidden xl:flex flex-1 min-w-[240px] bg-white rounded-3xl border border-slate-200/80 p-4 shadow-sm overflow-hidden flex-col">
+        <div className="flex flex-1 min-w-[240px] max-w-[500px] bg-white rounded-3xl border border-slate-200/80 p-4 shadow-sm overflow-hidden flex-col">
+
+          
+          {/* Buscador de código de barras / manual */}
+          <div className="relative mb-3">
+            <ProductFinder inputRef={searchInputRef} />
+            <span className="absolute right-4 top-3 text-[9px] font-extrabold bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded border border-slate-200 pointer-events-none">
+              F8
+            </span>
+          </div>
+
           {/* Selector de Categorías */}
           <div className="flex items-center gap-2 border-b border-slate-100 pb-3 mb-4 overflow-x-auto">
             {categorias.map((cat) => (
@@ -525,7 +528,7 @@ export function CashRegister() {
           </div>
 
           {/* Cuadrícula de Productos */}
-          <div className="flex-1 overflow-y-auto grid grid-cols-2 xl:grid-cols-3 gap-3 pr-1 align-content-start">
+          <div className="flex-1 overflow-y-auto grid grid-cols-2 2xl:grid-cols-3 gap-3 pr-1 align-content-start">
             {categoriaActiva === 'Emporio' ? (
               [
                 { name: 'Pollo Fresco', emoji: '🍗' },
@@ -612,8 +615,21 @@ export function CashRegister() {
         </div>
 
         {/* COLUMNA 3 (DERECHA - CAJA & AUDITORÍA): Totales, Liquidación y Cierre de Caja */}
-        <div className="w-[420px] xl:w-[460px] rounded-3xl border border-slate-200/80 bg-white p-4 shadow-md flex flex-col justify-between overflow-y-auto flex-shrink-0">
-          <div className="flex flex-col gap-4">
+        <div className="relative w-[320px] xl:w-[360px] 2xl:w-[420px] rounded-3xl flex flex-col flex-shrink-0">
+          <div className="bg-white rounded-3xl border border-slate-200/80 shadow-md flex flex-col justify-between overflow-y-auto h-full p-4">
+          
+          {/* Botón flotante Arqueo */}
+          <button
+            type="button"
+            onClick={() => setShowArqueoModal(true)}
+            className="absolute -top-3 -right-3 w-10 h-10 bg-orange-500 text-white rounded-full flex items-center justify-center shadow-lg hover:shadow-xl hover:scale-110 hover:bg-orange-600 transition-all z-20 group cursor-pointer"
+          >
+            📊
+            <span className="absolute -top-10 right-0 w-max bg-slate-800 text-white text-[10px] font-bold px-3 py-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-md">
+              Arqueo financiero en tiempo real
+            </span>
+          </button>
+          <div className="flex flex-col">
             <h2 className="text-sm font-black text-slate-800 pb-2 border-b border-slate-100 uppercase tracking-wider flex justify-between items-center">
               <span>Liquidación de Caja</span>
               <kbd className="px-1.5 py-0.5 bg-slate-100 border border-slate-300 rounded font-mono text-[8px] text-slate-500 shadow-sm">F9</kbd>
@@ -777,43 +793,13 @@ export function CashRegister() {
               </div>
             )}
 
-            {/* Arqueo de Caja y Billeteras en Vivo */}
-            <div className=" border-t border-slate-100 pt-2 flex flex-col gap-2">
-              <span className="text-[10px] font-black text-slate-400 uppercase tracking-wider block">
-                Arqueo Financiero en Vivo
-              </span>
-              <div className="grid grid-cols-3 gap-2 max-h-[120px] overflow-y-auto pr-1">
-                <div className="p-2.5 bg-slate-50 border border-slate-200/50 rounded-xl flex flex-col">
-                  <span className="text-[8px] text-slate-400 font-bold uppercase">Caja Física (Drawer)</span>
-                  <span className="text-xs font-black font-mono text-slate-700 mt-0.5">
-                    S/ {efectivoCajaFisica.toFixed(2)}
-                  </span>
-                </div>
-                {cuentasBilletera.map((cta) => (
-                  <div key={cta.id} className="p-2.5 bg-slate-50 border border-slate-200/50 rounded-xl flex flex-col">
-                    <span className="text-[8px] text-slate-400 font-bold uppercase truncate" title={cta.nombre}>
-                      {cta.nombre}
-                    </span>
-                    <span className="text-xs font-black font-mono text-orange-600 mt-0.5">
-                      S/ {cta.saldo.toFixed(2)}
-                    </span>
-                  </div>
-                ))}
-              </div>
-              <div className="mt-1 bg-slate-900 text-white p-3 rounded-xl flex justify-between items-center shadow-inner">
-                <span className="text-[9px] font-black uppercase tracking-wider">Saldo Total Diario:</span>
-                <span className="text-xs font-black font-mono text-orange-400">
-                  S/ {(efectivoCajaFisica + cuentasBilletera.reduce((sum, c) => sum + c.saldo, 0)).toFixed(2)}
-                </span>
-              </div>
-            </div>
-
-
+            
           </div>
+        </div>
 
-          {/* Botón de Confirmación Principal */}
-          <div className="flex flex-col gap-1.5 mt-2">
-            <button
+        {/* Botón de Confirmación Principal */}
+        <div className="flex flex-col gap-1.5 mt-2">
+          <button
               onClick={handleProcessCheckout}
               disabled={isProcessing || items.length === 0}
               className={`

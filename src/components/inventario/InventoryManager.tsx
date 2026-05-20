@@ -335,10 +335,10 @@ export function InventoryManager() {
     .reduce((sum, p) => sum + p.monto_total, 0);
 
   return (
-    <div className="flex h-screen bg-slate-50 text-slate-800 p-6 gap-6 font-sans antialiased overflow-hidden">
+    <div className="flex h-screen bg-slate-50 text-slate-800 p-6 gap-3 font-sans antialiased overflow-hidden">
       
       {/* Columna Izquierda: Panel de Trabajo e Indicadores Financieros */}
-      <div className="flex flex-1 flex-col gap-5 overflow-hidden">
+      <div className="flex flex-1 flex-col gap-2 overflow-hidden">
         
         {/* Encabezado Principal */}
         <header className="flex w-full items-center justify-between border-b border-slate-200/80 pb-4 flex-shrink-0">
@@ -423,54 +423,93 @@ export function InventoryManager() {
             </h2>
 
             <div className="flex-1 overflow-y-auto pr-1">
-              <table className="w-full border-collapse text-left text-sm text-slate-600">
-                <thead>
-                  <tr className="border-b border-slate-100 text-xs font-bold uppercase tracking-wider text-slate-400">
-                    <th className="pb-3 font-extrabold">Producto</th>
-                    <th className="pb-3 font-extrabold">Código</th>
-                    <th className="pb-3 text-right font-extrabold">Costo</th>
-                    <th className="pb-3 text-right font-extrabold">Venta</th>
-                    <th className="pb-3 text-right font-extrabold">Margen %</th>
-                    <th className="pb-3 text-right font-extrabold">Stock</th>
-                    <th className="pb-3 text-center font-extrabold">Acción</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100 font-mono">
-                  {mockProducts.map((prod) => {
-                    const isLow = prod.stock < 5;
-                    const provObj = mockProveedores.find(p => p.id === prod.proveedor_id);
-                    const margenImpl = prod.precio_costo > 0 ? (((prod.precio_venta / prod.precio_costo) - 1) * 100) : 0;
-                    
-                    return (
-                      <tr key={prod.id} className="hover:bg-slate-50 transition-colors">
-                        <td className="py-3.5 font-sans font-bold text-slate-800">
-                          {prod.nombre}
-                          {provObj && (
-                            <span className="block text-[10px] text-orange-600 font-sans font-normal mt-0.5">
-                              Visita: {provObj.dia_visita} ({provObj.nombre})
+              <div className="overflow-x-auto rounded-xl border border-slate-200/60 shadow-sm bg-white">
+                <table className="w-full border-collapse text-left text-sm text-slate-600">
+                  <thead className="bg-slate-50/80">
+                    <tr className="border-b border-slate-200/60 text-[10px] font-black uppercase tracking-wider text-slate-500">
+                      <th className="p-3">Fecha y Horas</th>
+                      <th className="p-3 text-right">Apertura (S/)</th>
+                      <th className="p-3 text-right">Ventas (S/)</th>
+                      <th className="p-3 text-right">Egresos (S/)</th>
+                      <th className="p-3 text-right text-slate-700">Esperado (S/)</th>
+                      <th className="p-3 text-right text-indigo-700">Declarado (S/)</th>
+                      <th className="p-3 text-right">Desviación (S/)</th>
+                      <th className="p-3 text-right text-slate-800">Total Neto (S/)</th>
+                      <th className="p-3 text-center">Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100/80 font-mono text-xs">
+                    {historialCierres.map((cierre) => {
+                      const tieneDesviacion = Math.abs(cierre.desviacion) > 0.01;
+                      const esNegativa = cierre.desviacion < -0.01;
+                      const esPositiva = cierre.desviacion > 0.01;
+
+                      return (
+                        <tr key={cierre.id} className="hover:bg-orange-50/30 transition-colors">
+                          <td className="p-3 font-sans">
+                            <span className="font-bold text-slate-800 block text-xs">
+                              📅 {new Date(cierre.fechaApertura).toLocaleDateString()}
                             </span>
-                          )}
-                        </td>
-                        <td className="py-3.5 text-xs text-slate-400">{prod.codigo}</td>
-                        <td className="py-3.5 text-right text-slate-600">S/ {prod.precio_costo.toFixed(2)}</td>
-                        <td className="py-3.5 text-right text-orange-600 font-bold">S/ {prod.precio_venta.toFixed(2)}</td>
-                        <td className="py-3.5 text-right text-indigo-600 font-extrabold">{margenImpl.toFixed(1)}%</td>
-                        <td className={`py-3.5 text-right font-black ${isLow ? 'text-rose-600 font-extrabold' : 'text-slate-800'}`}>
-                          {prod.stock} {isLow && '⚠️'}
-                        </td>
-                        <td className="py-3.5 text-center">
-                          <button
-                            onClick={() => handleEditProductClick(prod)}
-                            className="px-3 py-1.5 text-[10px] rounded-xl border border-slate-200 bg-white hover:bg-slate-50 font-black text-slate-500 uppercase tracking-wider transition-all cursor-pointer shadow-sm"
-                          >
-                            Editar
-                          </button>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
+                            <div className="flex gap-2 mt-1">
+                              <span className="text-[9px] font-black text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded">
+                                AP: {new Date(cierre.fechaApertura).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                              </span>
+                              <span className="text-[9px] font-black text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded">
+                                CI: {new Date(cierre.fechaCierre).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                              </span>
+                            </div>
+                          </td>
+                          <td className="p-3 text-right text-slate-600 font-medium">{cierre.montoApertura.toFixed(2)}</td>
+                          <td className="p-3 text-right">
+                            <span className="block font-bold text-slate-800">{(cierre.ventasEfectivo + cierre.ventasBilletera).toFixed(2)}</span>
+                            <div className="flex flex-col items-end gap-0.5 mt-0.5">
+                              <span className="text-[8px] font-bold text-slate-400">EFE: {cierre.ventasEfectivo.toFixed(2)}</span>
+                              <span className="text-[8px] font-bold text-orange-600">BIL: {cierre.ventasBilletera.toFixed(2)}</span>
+                            </div>
+                          </td>
+                          <td className="p-3 text-right text-rose-600 font-semibold">
+                            {(cierre.egresosEfectivo + cierre.egresosBilletera).toFixed(2)}
+                            {(cierre.egresosEfectivo > 0 || cierre.egresosBilletera > 0) && (
+                              <div className="flex flex-col items-end gap-0.5 mt-0.5">
+                                {cierre.egresosEfectivo > 0 && <span className="text-[8px] font-bold text-rose-400">EFE: {cierre.egresosEfectivo.toFixed(2)}</span>}
+                                {cierre.egresosBilletera > 0 && <span className="text-[8px] font-bold text-rose-400">BIL: {cierre.egresosBilletera.toFixed(2)}</span>}
+                              </div>
+                            )}
+                          </td>
+                          <td className="p-3 text-right text-slate-700 font-bold">{cierre.saldoFinalEfectivo.toFixed(2)}</td>
+                          <td className="p-3 text-right text-indigo-700 font-black">{cierre.efectivoDeclarado.toFixed(2)}</td>
+                          <td className="p-3 text-right font-black">
+                            {!tieneDesviacion ? (
+                              <span className="inline-flex items-center px-2 py-1 rounded-md text-[9px] font-black bg-orange-50 text-orange-700 border border-orange-200/60">
+                                0.00 ✓
+                              </span>
+                            ) : esNegativa ? (
+                              <span className="inline-flex items-center px-2 py-1 rounded-md text-[9px] font-black bg-rose-50 text-rose-700 border border-rose-200/60 animate-pulse">
+                                {cierre.desviacion.toFixed(2)} ⚠️
+                              </span>
+                            ) : (
+                              <span className="inline-flex items-center px-2 py-1 rounded-md text-[9px] font-black bg-amber-50 text-amber-700 border border-amber-200/60">
+                                +{cierre.desviacion.toFixed(2)} 💰
+                              </span>
+                            )}
+                          </td>
+                          <td className="p-3 text-right text-slate-800 font-black text-sm">
+                            {cierre.totalNeto.toFixed(2)}
+                          </td>
+                          <td className="p-3 text-center">
+                            <button
+                              onClick={() => setSelectedAuditCierre(cierre)}
+                              className="px-3 py-1.5 text-[9px] rounded-lg border border-slate-200 bg-white hover:bg-slate-50 font-black text-slate-600 uppercase tracking-wider transition-all cursor-pointer shadow-sm hover:border-slate-300"
+                            >
+                              📄 Detalles
+                            </button>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+                </div>
             </div>
           </div>
         )}
@@ -608,139 +647,83 @@ export function InventoryManager() {
             </h2>
 
             <div className="flex-1 overflow-y-auto pr-1">
-              <table className="w-full border-collapse text-left text-sm text-slate-600">
-                <thead>
-                  <tr className="border-b border-slate-100 text-xs font-bold uppercase tracking-wider text-slate-400">
-                    <th className="pb-3 font-extrabold">Nombre</th>
-                    <th className="pb-3 font-extrabold">RUC</th>
-                    <th className="pb-3 font-extrabold">Teléfono</th>
-                    <th className="pb-3 font-extrabold">Día de Visita</th>
-                    <th className="pb-3 text-center font-extrabold">Acciones</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100 font-mono">
-                  {mockProveedores.map((prov) => (
-                    <tr key={prov.id} className="hover:bg-slate-50 transition-colors">
-                      <td className="py-3.5 font-sans font-bold text-slate-800">{prov.nombre}</td>
-                      <td className="py-3.5 text-xs text-slate-500">{prov.ruc}</td>
-                      <td className="py-3.5 text-xs text-slate-500">{prov.telefono}</td>
-                      <td className="py-3.5 font-sans text-xs text-amber-700 font-extrabold uppercase">{prov.dia_visita}</td>
-                      <td className="py-3.5 text-center flex items-center justify-center gap-1.5">
-                        <button
-                          onClick={() => handleEditProveedorClick(prov)}
-                          className="px-2.5 py-1.5 text-[9px] rounded-lg border border-slate-200 bg-white hover:bg-slate-50 font-black text-slate-500 uppercase tracking-wider transition-all cursor-pointer"
-                        >
-                          Editar
-                        </button>
-                        <button
-                          onClick={async () => {
-                            if (await requestConfirm('¿Está seguro que desea eliminar este proveedor? Se desvinculará de los productos asociados.', 'cancel')) {
-                              eliminarMockProveedor(prov.id);
-                            }
-                          }}
-                          className="px-2.5 py-1.5 text-[9px] rounded-lg border border-rose-200 bg-rose-50 hover:bg-rose-100 font-black text-rose-700 uppercase tracking-wider transition-all cursor-pointer"
-                        >
-                          Eliminar
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        )}
-
-        {/* -------------------------------------------------------------------------
-            CONTENIDO PESTAÑA: REPORTES DE CIERRE DIARIO (AUDITORÍA)
-            ------------------------------------------------------------------------- */}
-        {activeTab === 'cierres' && (
-          <div className="flex-1 overflow-hidden bg-white rounded-3xl border border-slate-200/80 p-5 shadow-sm flex flex-col animate-in fade-in duration-300">
-            <h2 className="text-sm font-bold text-slate-700 mb-4 flex justify-between items-center">
-              <span>Historial de Cierres Diarios y Arqueo Financiero</span>
-              <span className="text-xs bg-slate-100 text-slate-600 border border-slate-200/50 px-2.5 py-0.5 rounded-full font-black">
-                {historialCierres.length} Cierres
-              </span>
-            </h2>
-
-            <div className="flex-1 overflow-y-auto pr-1">
-              {historialCierres.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-20 text-center text-slate-400">
-                  <svg className="h-10 w-10 mb-2 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                  </svg>
-                  <p className="text-xs font-bold uppercase tracking-wider text-slate-500">No hay registros de cierres guardados</p>
-                  <p className="text-[11px] text-slate-400 mt-1">Cuando ejecutes el Cierre Diario [F10] en la caja, el reporte auditable aparecerá acá al instante.</p>
-                </div>
-              ) : (
+              <div className="overflow-x-auto rounded-xl border border-slate-200/60 shadow-sm bg-white">
                 <table className="w-full border-collapse text-left text-sm text-slate-600">
-                  <thead>
-                    <tr className="border-b border-slate-100 text-xs font-bold uppercase tracking-wider text-slate-400">
-                      <th className="pb-3 font-extrabold">Fecha y Horas</th>
-                      <th className="pb-3 text-right font-extrabold">Fondo Apertura</th>
-                      <th className="pb-3 text-right font-extrabold">Ventas (Efe/Bill)</th>
-                      <th className="pb-3 text-right font-extrabold">Egresos</th>
-                      <th className="pb-3 text-right font-extrabold">Efe. Esperado</th>
-                      <th className="pb-3 text-right font-extrabold">Efe. Real Declarado</th>
-                      <th className="pb-3 text-right font-extrabold">Desviación</th>
-                      <th className="pb-3 text-right font-extrabold">Total Neto Recaudado</th>
-                      <th className="pb-3 text-center font-extrabold">Acciones</th>
+                  <thead className="bg-slate-50/80">
+                    <tr className="border-b border-slate-200/60 text-[10px] font-black uppercase tracking-wider text-slate-500">
+                      <th className="p-3">Fecha y Horas</th>
+                      <th className="p-3 text-right">Apertura (S/)</th>
+                      <th className="p-3 text-right">Ventas (S/)</th>
+                      <th className="p-3 text-right">Egresos (S/)</th>
+                      <th className="p-3 text-right text-slate-700">Esperado (S/)</th>
+                      <th className="p-3 text-right text-indigo-700">Declarado (S/)</th>
+                      <th className="p-3 text-right">Desviación (S/)</th>
+                      <th className="p-3 text-right text-slate-800">Total Neto (S/)</th>
+                      <th className="p-3 text-center">Acciones</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-100 font-mono">
+                  <tbody className="divide-y divide-slate-100/80 font-mono text-xs">
                     {historialCierres.map((cierre) => {
                       const tieneDesviacion = Math.abs(cierre.desviacion) > 0.01;
                       const esNegativa = cierre.desviacion < -0.01;
                       const esPositiva = cierre.desviacion > 0.01;
 
                       return (
-                        <tr key={cierre.id} className="hover:bg-slate-50 transition-colors">
-                          <td className="py-3.5 font-sans text-xs">
-                            <span className="font-bold text-slate-800 block">
+                        <tr key={cierre.id} className="hover:bg-orange-50/30 transition-colors">
+                          <td className="p-3 font-sans">
+                            <span className="font-bold text-slate-800 block text-xs">
                               📅 {new Date(cierre.fechaApertura).toLocaleDateString()}
                             </span>
-                            <span className="text-[10px] text-slate-400 block mt-0.5">
-                              🕒 Apertura: {new Date(cierre.fechaApertura).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                            </span>
-                            <span className="text-[10px] text-slate-400 block">
-                              🕒 Cierre: {new Date(cierre.fechaCierre).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                            </span>
+                            <div className="flex gap-2 mt-1">
+                              <span className="text-[9px] font-black text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded">
+                                AP: {new Date(cierre.fechaApertura).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                              </span>
+                              <span className="text-[9px] font-black text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded">
+                                CI: {new Date(cierre.fechaCierre).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                              </span>
+                            </div>
                           </td>
-                          <td className="py-3.5 text-right text-slate-600">S/ {cierre.montoApertura.toFixed(2)}</td>
-                          <td className="py-3.5 text-right text-slate-600">
-                            <span className="block font-bold text-slate-800">S/ {(cierre.ventasEfectivo + cierre.ventasBilletera).toFixed(2)}</span>
-                            <span className="block text-[9px] text-slate-400">💵 Efe: S/ {cierre.ventasEfectivo.toFixed(2)}</span>
-                            <span className="block text-[9px] text-orange-600">📱 Bill: S/ {cierre.ventasBilletera.toFixed(2)}</span>
+                          <td className="p-3 text-right text-slate-600 font-medium">{cierre.montoApertura.toFixed(2)}</td>
+                          <td className="p-3 text-right">
+                            <span className="block font-bold text-slate-800">{(cierre.ventasEfectivo + cierre.ventasBilletera).toFixed(2)}</span>
+                            <div className="flex flex-col items-end gap-0.5 mt-0.5">
+                              <span className="text-[8px] font-bold text-slate-400">EFE: {cierre.ventasEfectivo.toFixed(2)}</span>
+                              <span className="text-[8px] font-bold text-orange-600">BIL: {cierre.ventasBilletera.toFixed(2)}</span>
+                            </div>
                           </td>
-                          <td className="py-3.5 text-right text-rose-600 font-semibold">
-                            S/ {(cierre.egresosEfectivo + cierre.egresosBilletera).toFixed(2)}
-                            {cierre.egresosEfectivo > 0 && <span className="block text-[9px] text-rose-400">💵 Efe: S/ {cierre.egresosEfectivo.toFixed(2)}</span>}
-                            {cierre.egresosBilletera > 0 && <span className="block text-[9px] text-rose-400">📱 Bill: S/ {cierre.egresosBilletera.toFixed(2)}</span>}
+                          <td className="p-3 text-right text-rose-600 font-semibold">
+                            {(cierre.egresosEfectivo + cierre.egresosBilletera).toFixed(2)}
+                            {(cierre.egresosEfectivo > 0 || cierre.egresosBilletera > 0) && (
+                              <div className="flex flex-col items-end gap-0.5 mt-0.5">
+                                {cierre.egresosEfectivo > 0 && <span className="text-[8px] font-bold text-rose-400">EFE: {cierre.egresosEfectivo.toFixed(2)}</span>}
+                                {cierre.egresosBilletera > 0 && <span className="text-[8px] font-bold text-rose-400">BIL: {cierre.egresosBilletera.toFixed(2)}</span>}
+                              </div>
+                            )}
                           </td>
-                          <td className="py-3.5 text-right text-slate-700 font-bold">S/ {cierre.saldoFinalEfectivo.toFixed(2)}</td>
-                          <td className="py-3.5 text-right text-indigo-900 font-black">S/ {cierre.efectivoDeclarado.toFixed(2)}</td>
-                          <td className="py-3.5 text-right font-black">
+                          <td className="p-3 text-right text-slate-700 font-bold">{cierre.saldoFinalEfectivo.toFixed(2)}</td>
+                          <td className="p-3 text-right text-indigo-700 font-black">{cierre.efectivoDeclarado.toFixed(2)}</td>
+                          <td className="p-3 text-right font-black">
                             {!tieneDesviacion ? (
-                              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[9px] font-black bg-orange-50 text-orange-700 border border-orange-200">
-                                S/ 0.00 ✓ (Cuadrado)
+                              <span className="inline-flex items-center px-2 py-1 rounded-md text-[9px] font-black bg-orange-50 text-orange-700 border border-orange-200/60">
+                                0.00 ✓
                               </span>
                             ) : esNegativa ? (
-                              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[9px] font-black bg-rose-50 text-rose-700 border border-rose-200 animate-pulse">
-                                S/ {cierre.desviacion.toFixed(2)} ⚠️ (Faltante)
+                              <span className="inline-flex items-center px-2 py-1 rounded-md text-[9px] font-black bg-rose-50 text-rose-700 border border-rose-200/60 animate-pulse">
+                                {cierre.desviacion.toFixed(2)} ⚠️
                               </span>
                             ) : (
-                              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[9px] font-black bg-amber-50 text-amber-700 border border-amber-200">
-                                +S/ {cierre.desviacion.toFixed(2)} 💰 (Sobrante)
+                              <span className="inline-flex items-center px-2 py-1 rounded-md text-[9px] font-black bg-amber-50 text-amber-700 border border-amber-200/60">
+                                +{cierre.desviacion.toFixed(2)} 💰
                               </span>
                             )}
                           </td>
-                          <td className="py-3.5 text-right text-slate-800 font-black text-sm">
-                            S/ {cierre.totalNeto.toFixed(2)}
+                          <td className="p-3 text-right text-slate-800 font-black text-sm">
+                            {cierre.totalNeto.toFixed(2)}
                           </td>
-                          <td className="py-3.5 text-center">
+                          <td className="p-3 text-center">
                             <button
                               onClick={() => setSelectedAuditCierre(cierre)}
-                              className="px-4 py-2 text-[10px] rounded-xl border border-slate-200 bg-white hover:bg-slate-50 font-black text-slate-600 uppercase tracking-wider transition-all cursor-pointer shadow-sm hover:border-slate-300"
+                              className="px-3 py-1.5 text-[9px] rounded-lg border border-slate-200 bg-white hover:bg-slate-50 font-black text-slate-600 uppercase tracking-wider transition-all cursor-pointer shadow-sm hover:border-slate-300"
                             >
                               📄 Detalles
                             </button>
@@ -750,6 +733,120 @@ export function InventoryManager() {
                     })}
                   </tbody>
                 </table>
+                </div>
+            </div>
+          </div>
+        )}
+
+        {/* -------------------------------------------------------------------------
+            CONTENIDO PESTAÑA: REPORTES DE CIERRE DIARIO (AUDITORÍA)
+            ------------------------------------------------------------------------- */}
+        {activeTab === 'cierres' && (
+          <div className="flex-1 overflow-hidden bg-white rounded-3xl border border-slate-200/80 p-4 shadow-sm flex flex-col animate-in fade-in duration-300">
+            <h2 className="text-sm font-bold text-slate-700 mb-4 flex justify-between items-center">
+              <span>Historial de Cierres Diarios y Arqueo Financiero</span>
+              <span className="text-xs bg-slate-100 text-slate-600 border border-slate-200/50 px-2.5 py-0.5 rounded-full font-black">
+                {historialCierres.length} Cierres
+              </span>
+            </h2>
+
+            <div className="flex-1 overflow-y-auto">
+              {historialCierres.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-20 text-center text-slate-400">
+                  <svg className="h-10 w-10 mb-2 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                  <p className="text-xs font-bold uppercase tracking-wider text-slate-500">No hay registros de cierres guardados</p>
+                  <p className="text-[11px] text-slate-400 mt-1">Cuando ejecutes el Cierre Diario [F10] en la caja, el reporte auditable aparecerá acá al instante.</p>
+                </div>
+              ) : (
+                <div className="overflow-x-auto rounded-xl border border-slate-200/60 shadow-sm bg-white">
+                <table className="w-full border-collapse text-left text-sm text-slate-600">
+                  <thead className="bg-slate-50/80">
+                    <tr className="border-b border-slate-200/60 text-[10px] font-black uppercase tracking-wider text-slate-500">
+                      <th className="p-3">Fecha y Horas</th>
+                      <th className="p-3 text-right">Apertura (S/)</th>
+                      <th className="p-3 text-right">Ventas (S/)</th>
+                      <th className="p-3 text-right">Egresos (S/)</th>
+                      <th className="p-3 text-right text-slate-700">Esperado (S/)</th>
+                      <th className="p-3 text-right text-indigo-700">Declarado (S/)</th>
+                      <th className="p-3 text-right">Desviación (S/)</th>
+                      <th className="p-3 text-right text-slate-800">Total Neto (S/)</th>
+                      <th className="p-3 text-center">Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100/80 font-mono text-xs">
+                    {historialCierres.map((cierre) => {
+                      const tieneDesviacion = Math.abs(cierre.desviacion) > 0.01;
+                      const esNegativa = cierre.desviacion < -0.01;
+                      const esPositiva = cierre.desviacion > 0.01;
+
+                      return (
+                        <tr key={cierre.id} className="hover:bg-orange-50/30 transition-colors">
+                          <td className="p-3 font-sans">
+                            <span className="font-bold text-slate-800 block text-xs">
+                              📅 {new Date(cierre.fechaApertura).toLocaleDateString()}
+                            </span>
+                            <div className="flex gap-2 mt-1">
+                              <span className="text-[9px] font-black text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded">
+                                AP: {new Date(cierre.fechaApertura).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                              </span>
+                              <span className="text-[9px] font-black text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded">
+                                CI: {new Date(cierre.fechaCierre).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                              </span>
+                            </div>
+                          </td>
+                          <td className="p-3 text-right text-slate-600 font-medium">{cierre.montoApertura.toFixed(2)}</td>
+                          <td className="p-3 text-right">
+                            <span className="block font-bold text-slate-800">{(cierre.ventasEfectivo + cierre.ventasBilletera).toFixed(2)}</span>
+                            <div className="flex flex-col items-end gap-0.5 mt-0.5">
+                              <span className="text-[8px] font-bold text-slate-400">EFE: {cierre.ventasEfectivo.toFixed(2)}</span>
+                              <span className="text-[8px] font-bold text-orange-600">BIL: {cierre.ventasBilletera.toFixed(2)}</span>
+                            </div>
+                          </td>
+                          <td className="p-3 text-right text-rose-600 font-semibold">
+                            {(cierre.egresosEfectivo + cierre.egresosBilletera).toFixed(2)}
+                            {(cierre.egresosEfectivo > 0 || cierre.egresosBilletera > 0) && (
+                              <div className="flex flex-col items-end gap-0.5 mt-0.5">
+                                {cierre.egresosEfectivo > 0 && <span className="text-[8px] font-bold text-rose-400">EFE: {cierre.egresosEfectivo.toFixed(2)}</span>}
+                                {cierre.egresosBilletera > 0 && <span className="text-[8px] font-bold text-rose-400">BIL: {cierre.egresosBilletera.toFixed(2)}</span>}
+                              </div>
+                            )}
+                          </td>
+                          <td className="p-3 text-right text-slate-700 font-bold">{cierre.saldoFinalEfectivo.toFixed(2)}</td>
+                          <td className="p-3 text-right text-indigo-700 font-black">{cierre.efectivoDeclarado.toFixed(2)}</td>
+                          <td className="p-3 text-right font-black">
+                            {!tieneDesviacion ? (
+                              <span className="inline-flex items-center px-2 py-1 rounded-md text-[9px] font-black bg-orange-50 text-orange-700 border border-orange-200/60">
+                                0.00 ✓
+                              </span>
+                            ) : esNegativa ? (
+                              <span className="inline-flex items-center px-2 py-1 rounded-md text-[9px] font-black bg-rose-50 text-rose-700 border border-rose-200/60 animate-pulse">
+                                {cierre.desviacion.toFixed(2)} ⚠️
+                              </span>
+                            ) : (
+                              <span className="inline-flex items-center px-2 py-1 rounded-md text-[9px] font-black bg-amber-50 text-amber-700 border border-amber-200/60">
+                                +{cierre.desviacion.toFixed(2)} 💰
+                              </span>
+                            )}
+                          </td>
+                          <td className="p-3 text-right text-slate-800 font-black text-sm">
+                            {cierre.totalNeto.toFixed(2)}
+                          </td>
+                          <td className="p-3 text-center">
+                            <button
+                              onClick={() => setSelectedAuditCierre(cierre)}
+                              className="px-3 py-1.5 text-[9px] rounded-lg border border-slate-200 bg-white hover:bg-slate-50 font-black text-slate-600 uppercase tracking-wider transition-all cursor-pointer shadow-sm hover:border-slate-300"
+                            >
+                              📄 Detalles
+                            </button>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+                </div>
               )}
             </div>
           </div>
@@ -896,7 +993,7 @@ export function InventoryManager() {
       )}
 
       {/* Columna Derecha: Formulario Contextual */}
-      <div className="w-[420px] flex flex-col gap-5 overflow-hidden flex-shrink-0">
+      <div className="w-[340px] xl:w-[380px] 2xl:w-[420px] flex flex-col gap-5 overflow-hidden flex-shrink-0">
 
         {/* -------------------------------------------------------------------------
             TARJETA DE ARQUEO FINANCIERO Y COMPRAS (ERP GLOBAL)

@@ -9,7 +9,7 @@ export function Sidebar() {
   const pathname = usePathname();
   const { cajaActivaId, mockMovimientos, clearActiveTab } = useCartStore();
   const [showAuditoriaModal, setShowAuditoriaModal] = useState(false);
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(true);
 
   // Auto-detectar pantalla chica al montar y redimensionar
   useEffect(() => {
@@ -44,7 +44,7 @@ export function Sidebar() {
         className={`
           h-screen sticky top-0 flex flex-col justify-between border-r border-slate-200/80 bg-white flex-shrink-0 z-30 
           shadow-[4px_0_24px_-10px_rgba(0,0,0,0.03)] transition-all duration-300 ease-in-out
-          ${isCollapsed ? 'w-20' : 'w-64'}
+          ${isCollapsed ? 'w-20' : 'w-56 2xl:w-64'}
         `}
       >
         {/* Superior: Logo y Navegación */}
