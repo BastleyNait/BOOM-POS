@@ -182,14 +182,14 @@ export function ProductFinder({ inputRef }: ProductFinderProps) {
           onKeyDown={handleKeyDown}
           placeholder="[F8] Escanear código o escribir nombre del producto..."
           className="
-            w-full rounded-2xl border border-slate-200 bg-white px-6 py-4 pl-12 pr-12 text-sm text-slate-800 placeholder-slate-400
-            transition-all duration-300 outline-none
-            focus:border-orange-600 focus:bg-white focus:shadow-[0_4px_20px_-3px_rgba(16,185,129,0.12)] focus:ring-1 focus:ring-orange-600/20
+            w-full rounded-xl border border-edge bg-inset px-6 py-4 pl-12 pr-12 text-sm text-ink placeholder-ink-tertiary
+            transition-all duration-200 ease-expo outline-none
+            focus:border-brand focus:bg-surface focus:shadow-[0_4px_20px_-3px] focus:shadow-brand/10 focus:ring-1 focus:ring-brand/20
           "
         />
         
         {/* Ícono de Búsqueda (Lupa) */}
-        <div className="absolute left-4 text-slate-400">
+        <div className="absolute left-4 text-ink-tertiary">
           <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
@@ -198,7 +198,7 @@ export function ProductFinder({ inputRef }: ProductFinderProps) {
         {/* Loading Spinner */}
         {loading && (
           <div className="absolute right-4">
-            <div className="h-5 w-5 animate-spin rounded-full border-2 border-orange-500 border-t-transparent" />
+            <div className="h-5 w-5 animate-spin rounded-full border-2 border-brand border-t-transparent" />
           </div>
         )}
       </div>
@@ -206,8 +206,8 @@ export function ProductFinder({ inputRef }: ProductFinderProps) {
       {/* Resultados de Búsqueda / Sugerencias Flotantes */}
       {results.length > 0 && (
         <div className="
-          absolute left-0 right-0 z-50 mt-2 max-h-60 overflow-y-auto rounded-2xl border border-slate-200
-          bg-white p-2 shadow-2xl animate-in fade-in slide-in-from-top-2 duration-200
+          absolute left-0 right-0 z-50 mt-2 max-h-60 overflow-y-auto rounded-xl border border-edge
+          bg-surface p-2 shadow-float animate-in fade-in slide-in-from-top-2 duration-200
         ">
           {results.map((prod, idx) => {
             const isSelected = selectedIndex === idx;
@@ -216,20 +216,22 @@ export function ProductFinder({ inputRef }: ProductFinderProps) {
                 key={prod.id}
                 onClick={() => handleSelectProduct(prod)}
                 className={`
-                  flex w-full items-center justify-between rounded-xl px-4 py-3 text-left transition-all duration-200
+                  flex w-full items-center justify-between rounded-xl px-4 py-3 text-left
+                  transition-all duration-200 ease-expo active:scale-[0.98]
+                  focus-visible:ring-2 focus-visible:ring-brand/30 focus-visible:outline-none
                   ${isSelected 
-                    ? 'bg-gradient-to-r from-orange-50 to-amber-50 text-slate-800 border-l-4 border-orange-600 font-medium' 
-                    : 'text-slate-600 hover:bg-slate-50'
+                    ? 'bg-brand-subtle text-ink font-medium' 
+                    : 'text-ink-secondary hover:bg-inset'
                   }
                 `}
               >
                 <div>
-                  <div className="font-semibold text-sm">{prod.nombre}</div>
-                  <div className="font-mono text-[11px] text-slate-400">Cod: {prod.codigo}</div>
+                  <div className="font-semibold text-sm text-ink">{prod.nombre}</div>
+                  <div className="font-mono text-[11px] text-ink-tertiary">Cod: {prod.codigo}</div>
                 </div>
                 <div className="text-right">
-                  <div className="font-mono font-bold text-orange-600">S/ {Number(prod.precio_venta).toFixed(2)}</div>
-                  <div className={`text-[10px] ${prod.stock < 5 ? 'text-rose-600 font-bold' : 'text-slate-400'}`}>
+                  <div className="font-mono font-bold text-brand">S/ {Number(prod.precio_venta).toFixed(2)}</div>
+                  <div className={`text-[10px] ${prod.stock < 5 ? 'text-negative font-bold' : 'text-ink-tertiary'}`}>
                     Stock: {prod.stock}
                   </div>
                 </div>

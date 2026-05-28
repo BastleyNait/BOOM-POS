@@ -7,7 +7,7 @@ export function TabSelector() {
   const { tabs, activeTabIndex, setActiveTab } = useCartStore();
 
   return (
-    <div className="flex w-full items-center gap-2 border-b border-slate-200/80 pb-2">
+    <div className="flex w-full items-center gap-2 border-b border-edge pb-2">
       {tabs.map((tab, idx) => {
         const isActive = activeTabIndex === idx;
         const itemCount = tab.items.reduce((sum, item) => sum + item.cantidad, 0);
@@ -26,37 +26,38 @@ export function TabSelector() {
             key={idx}
             onClick={() => setActiveTab(idx)}
             className={`
-              relative flex flex-1 flex-col justify-center rounded-lg px-3 py-1.5 text-left transition-all duration-200 cursor-pointer
+              relative flex flex-1 flex-col justify-center rounded-xl px-3 py-1.5 text-left
+              transition-all duration-200 ease-expo cursor-pointer active:scale-[0.98]
+              focus-visible:ring-2 focus-visible:ring-brand/30 focus-visible:outline-none
               ${isActive 
-                ? 'bg-white border-l-4 border-orange-600 text-slate-800 shadow-sm shadow-slate-200/60'
-                : 'bg-slate-100/70 border-l-4 border-transparent text-slate-500 hover:bg-slate-100 hover:text-slate-700'
+                ? 'bg-surface border border-brand/40 text-ink shadow-card'
+                : 'bg-inset border border-edge text-ink-secondary hover:bg-surface hover:text-ink'
               }
-              border border-slate-200/80
             `}
           >
             <div className="flex w-full items-center justify-between">
-              <span className="text-[10px] font-black tracking-wider uppercase text-orange-600">
+              <span className="text-[10px] font-black tracking-wider uppercase text-brand-text">
                 F{idx + 1}
               </span>
               {itemCount > 0 && (
-                <span className="flex h-4 w-4 items-center justify-center rounded-full bg-orange-600 text-[9px] font-black text-white">
+                <span className="flex h-4 w-4 items-center justify-center rounded-full bg-brand text-[9px] font-black text-ink-inverted">
                   {itemCount}
                 </span>
               )}
             </div>
             
             <div className="flex w-full items-center justify-between mt-0.5">
-              <div className="font-extrabold text-xs text-slate-700 truncate max-w-[60%]">
+              <div className="font-extrabold text-xs text-ink truncate max-w-[60%]">
                 {tab.cliente ? tab.cliente.nombre : `Cliente ${idx + 1}`}
               </div>
-              <div className="text-[10px] font-mono font-bold text-slate-500">
+              <div className="text-[10px] font-mono font-bold text-ink-secondary">
                 S/ {total.toFixed(2)}
               </div>
             </div>
 
-            {/* Micro-animación de pestaña activa */}
+            {/* Accent bar for active tab */}
             {isActive && (
-              <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-gradient-to-r from-orange-600 to-amber-600" />
+              <span className="absolute bottom-0 left-2 right-2 h-[2px] bg-brand rounded-full" />
             )}
           </button>
         );
@@ -66,4 +67,3 @@ export function TabSelector() {
 }
 
 export default TabSelector;
-

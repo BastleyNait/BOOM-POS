@@ -398,19 +398,19 @@ export function CashRegister() {
   });
 
   return (
-    <div className="flex h-screen flex-col bg-slate-50 text-slate-800 p-6 gap-5 font-sans antialiased overflow-hidden">
+    <div className="flex min-h-[100dvh] flex-col bg-base text-ink p-6 gap-5 font-sans antialiased overflow-hidden transition-all duration-300 ease-expo">
       
       {/* 1. Header Premium */}
-      <header className="flex w-full items-center justify-between border-b border-slate-200/80 pb-4 flex-shrink-0">
+      <header className="flex w-full items-center justify-between border-b border-edge pb-4 flex-shrink-0 transition-colors duration-200">
         <div className="flex items-center gap-3">
           <div>
-            <h1 className="text-2xl font-black bg-gradient-to-r from-orange-600 to-amber-600 bg-clip-text text-transparent tracking-tight leading-none">
+            <h1 className="text-2xl font-black text-brand tracking-tight leading-none transition-colors duration-200">
               BOOM POS
             </h1>
           </div>
           {getIsMockMode() && (
-            <span className="inline-flex items-center gap-1.5 bg-orange-50 text-orange-700 border border-orange-200/70 text-[9px] font-black tracking-wider uppercase px-3 py-1 rounded-full shadow-sm">
-              <span className="h-1.5 w-1.5 rounded-full bg-orange-500 animate-pulse"></span>
+            <span className="inline-flex items-center gap-1.5 bg-brand-subtle text-brand-text border border-brand/20 text-[9px] font-black tracking-wider uppercase px-3 py-1 rounded-full shadow-card">
+              <span className="h-1.5 w-1.5 rounded-full bg-brand animate-pulse"></span>
               Modo Demo Local (Offline)
             </span>
           )}
@@ -419,8 +419,8 @@ export function CashRegister() {
         <div className="flex items-center gap-3">
           {cajaActivaId ? (
             <div className="flex items-center gap-2">
-              <span className="inline-flex items-center gap-1.5 bg-orange-50 text-orange-700 border border-orange-200/70 text-[9px] font-black tracking-wider uppercase px-4 py-2.5 rounded-xl shadow-sm">
-                <span className="h-1.5 w-1.5 rounded-full bg-orange-500 animate-pulse"></span>
+              <span className="inline-flex items-center gap-1.5 bg-brand-subtle text-brand-text border border-brand/20 text-[9px] font-black tracking-wider uppercase px-4 py-2.5 rounded-xl shadow-card">
+                <span className="h-1.5 w-1.5 rounded-full bg-brand animate-pulse"></span>
                 Caja Diaria Activa
               </span>
               <button
@@ -429,17 +429,17 @@ export function CashRegister() {
                   setEfectivoDeclaradoInput(efectivoCajaFisica.toFixed(2));
                   setShowCierreModal(true);
                 }}
-                className="inline-flex items-center gap-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 hover:text-rose-800 border border-rose-200/70 hover:border-rose-300 text-[9px] font-black tracking-wider uppercase px-4 py-2.5 rounded-xl transition-all cursor-pointer shadow-sm group"
+                className="inline-flex items-center gap-1.5 bg-negative-subtle hover:bg-negative-subtle/80 text-negative-text border border-negative/20 text-[9px] font-black tracking-wider uppercase px-4 py-2.5 rounded-xl transition-all duration-200 ease-expo cursor-pointer shadow-card active:scale-[0.98] group"
               >
-                <svg className="w-3 h-3 text-rose-700 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-3 h-3 text-negative transition-transform group-hover:scale-110 duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                 </svg>
                 <span>Cerrar Caja [F10]</span>
               </button>
             </div>
           ) : (
-            <span className="inline-flex items-center gap-1.5 bg-rose-50 text-rose-700 border border-rose-200/70 text-[9px] font-black tracking-wider uppercase px-4 py-2.5 rounded-xl shadow-sm">
-              <span className="h-1.5 w-1.5 rounded-full bg-rose-500 animate-pulse"></span>
+            <span className="inline-flex items-center gap-1.5 bg-negative-subtle text-negative-text border border-negative/20 text-[9px] font-black tracking-wider uppercase px-4 py-2.5 rounded-xl shadow-card">
+              <span className="h-1.5 w-1.5 rounded-full bg-negative animate-pulse"></span>
               Caja Cerrada
             </span>
           )}
@@ -458,15 +458,15 @@ export function CashRegister() {
         <div className="flex-1 max-w-[340px] 2xl:max-w-[440px] min-w-[280px] flex flex-col gap-3 overflow-hidden">
 
           {/* Calculadora Rápida [F7] (Rediseño Ultra-Compacto para maximizar la Canasta) */}
-          <div className="bg-white rounded-3xl border border-slate-200/80 p-3 shadow-sm flex flex-col gap-2">
+          <div className="bg-surface rounded-xl border border-edge p-3 shadow-card flex flex-col gap-2 transition-all duration-200 ease-expo">
             <div className="flex items-center justify-between">
-              <h3 className="text-xs font-black text-slate-700 flex items-center gap-1.5 uppercase tracking-wide">
-                <svg className="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <h3 className="text-xs font-black text-ink flex items-center gap-1.5 uppercase tracking-wide">
+                <svg className="w-3.5 h-3.5 text-ink-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
                 </svg>
                 Calculadora Rápida
               </h3>
-              <span className="text-[9px] font-extrabold bg-orange-50 text-orange-700 px-2 py-0.5 rounded border border-orange-200">
+              <span className="text-[9px] font-extrabold bg-brand-subtle text-brand-text px-2 py-0.5 rounded-full border border-brand/20">
                 [F7]
               </span>
             </div>
@@ -476,7 +476,7 @@ export function CashRegister() {
             {/* Formulario rápido delgado */}
             <div className="grid grid-cols-12 gap-2">
               <div className="col-span-7 flex flex-col gap-0.5">
-                <label className="text-[8px] font-black text-slate-400 uppercase">Detalle del Producto</label>
+                <label className="text-[8px] font-black text-ink-tertiary uppercase">Detalle del Producto</label>
                 <input
                   name="quick-item-name"
                   type="text"
@@ -489,12 +489,12 @@ export function CashRegister() {
                     }
                   }}
                   placeholder="Ej. Pollo Fresco"
-                  className="w-full rounded-xl border border-slate-200 bg-slate-50/50 py-1.5 px-2.5 text-xs font-bold text-slate-800 placeholder-slate-400 focus:outline-none focus:border-orange-600 focus:bg-white"
+                  className="w-full rounded-lg border border-edge bg-inset py-1.5 px-2.5 text-xs font-bold text-ink placeholder-ink-tertiary focus:outline-none focus:border-brand focus:bg-surface focus:ring-1 focus:ring-brand/20 transition-all duration-200 ease-expo"
                 />
               </div>
 
               <div className="col-span-5 flex flex-col gap-0.5">
-                <label className="text-[8px] font-black text-slate-400 uppercase">Monto Balanza (S/)</label>
+                <label className="text-[8px] font-black text-ink-tertiary uppercase">Monto Balanza (S/)</label>
                 <input
                   name="quick-item-price"
                   type="number"
@@ -508,23 +508,23 @@ export function CashRegister() {
                     }
                   }}
                   placeholder="0.00"
-                  className="w-full rounded-xl border border-slate-200 bg-slate-50/50 py-1.5 px-2.5 text-xs font-mono font-bold text-slate-800 placeholder-slate-400 focus:outline-none focus:border-orange-600 focus:bg-white text-right"
+                  className="w-full rounded-lg border border-edge bg-inset py-1.5 px-2.5 text-xs font-mono font-bold text-ink placeholder-ink-tertiary focus:outline-none focus:border-brand focus:bg-surface focus:ring-1 focus:ring-brand/20 text-right transition-all duration-200 ease-expo"
                 />
               </div>
             </div>
 
             {/* Sumario y botón ultra compacto */}
-            <div className="flex items-center justify-between border-t border-slate-100 pt-2 -mx-3 -mb-3 p-2 bg-slate-50/50 rounded-b-3xl px-3 flex-shrink-0">
+            <div className="flex items-center justify-between border-t border-edge pt-2 -mx-3 -mb-3 p-2 bg-inset rounded-b-xl px-3 flex-shrink-0 transition-all duration-200">
               <div className="flex items-center gap-1.5">
-                <span className="text-[8px] font-black text-slate-400 uppercase leading-none">Inyectar:</span>
-                <span className="text-xs font-black font-mono text-orange-600 leading-none">
+                <span className="text-[8px] font-black text-ink-tertiary uppercase leading-none">Inyectar:</span>
+                <span className="text-xs font-black font-mono text-brand leading-none">
                   S/ {(parseFloat(quickPrice) || 0).toFixed(2)}
                 </span>
               </div>
               <button
                 type="button"
                 onClick={handleAddQuickItem}
-                className="bg-orange-600 hover:bg-orange-700 text-white font-extrabold text-[9px] uppercase tracking-wider px-3.5 py-1.5 rounded-lg cursor-pointer shadow-sm active:scale-95 transition-all"
+                className="bg-brand hover:bg-brand-hover text-ink-inverted font-extrabold text-[9px] uppercase tracking-wider px-3.5 py-1.5 rounded-lg cursor-pointer shadow-card active:scale-[0.98] transition-all duration-200 ease-expo"
               >
                 + Inyectar (Enter)
               </button>
@@ -532,15 +532,15 @@ export function CashRegister() {
           </div>
 
           {/* Listado del Carrito */}
-          <div className="flex-1 flex flex-col overflow-hidden bg-white rounded-3xl border border-slate-200/80 p-4.5 shadow-sm">
+          <div className="flex-1 flex flex-col overflow-hidden bg-surface rounded-xl border border-edge p-4.5 shadow-card transition-all duration-200 ease-expo">
             <div className="flex items-center justify-between mb-2">
-              <h2 className="text-xs font-black text-slate-700 flex items-center gap-2 uppercase tracking-wide">
-                <svg className="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <h2 className="text-xs font-black text-ink flex items-center gap-2 uppercase tracking-wide">
+                <svg className="w-4 h-4 text-ink-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
                 </svg>
                 Canasta de Compras
               </h2>
-              <span className="text-[10px] bg-slate-100 px-2 py-0.5 rounded-full font-mono font-black text-slate-600 border border-slate-200/50">
+              <span className="text-[10px] bg-inset px-2 py-0.5 rounded-full font-mono font-black text-ink-secondary border border-edge shadow-inner">
                 {items.length} {items.length === 1 ? 'item' : 'items'}
               </span>
             </div>
@@ -550,13 +550,13 @@ export function CashRegister() {
             </div>
 
             {/* Botones de Control de Carrito */}
-            <div className="border-t border-slate-100 pt-2.5 mt-2 flex justify-between items-center">
+            <div className="border-t border-edge pt-2.5 mt-2 flex justify-between items-center transition-all duration-200">
               <div className="flex gap-1.5">
                 <button
                   onClick={() => undoClearActiveTab()}
                   disabled={!currentTab.undoStack || currentTab.undoStack.length === 0}
                   title="Deshacer limpiar carrito (Ctrl+Z)"
-                  className="p-1.5 bg-white hover:bg-slate-50 disabled:opacity-30 disabled:hover:bg-white text-slate-500 rounded-lg border border-slate-200 transition-all cursor-pointer shadow-sm flex items-center justify-center"
+                  className="p-1.5 bg-surface hover:bg-inset disabled:opacity-30 disabled:hover:bg-surface text-ink-secondary rounded-lg border border-edge transition-all duration-200 ease-expo cursor-pointer shadow-card flex items-center justify-center active:scale-[0.95]"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M3 7v6h6"/><path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"/></svg>
                 </button>
@@ -564,7 +564,7 @@ export function CashRegister() {
                   onClick={() => redoClearActiveTab()}
                   disabled={!currentTab.redoStack || currentTab.redoStack.length === 0}
                   title="Rehacer limpiar carrito (Ctrl+Y)"
-                  className="p-1.5 bg-white hover:bg-slate-50 disabled:opacity-30 disabled:hover:bg-white text-slate-500 rounded-lg border border-slate-200 transition-all cursor-pointer shadow-sm flex items-center justify-center"
+                  className="p-1.5 bg-surface hover:bg-inset disabled:opacity-30 disabled:hover:bg-surface text-ink-secondary rounded-lg border border-edge transition-all duration-200 ease-expo cursor-pointer shadow-card flex items-center justify-center active:scale-[0.95]"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 7v6h-6"/><path d="M3 17a9 9 0 0 1 9-9 9 9 0 0 1 6 2.3l3 2.7"/></svg>
                 </button>
@@ -577,40 +577,39 @@ export function CashRegister() {
                     clearActiveTab();
                   }
                 }}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white hover:bg-rose-50 text-slate-500 hover:text-rose-700 text-[10px] font-extrabold uppercase rounded-lg border border-slate-200 hover:border-rose-200 transition-all cursor-pointer shadow-sm group"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-surface hover:bg-negative-subtle text-ink-secondary hover:text-negative-text text-[10px] font-extrabold uppercase rounded-lg border border-edge hover:border-negative/20 transition-all duration-200 ease-expo cursor-pointer shadow-card active:scale-[0.98] group"
               >
-                <svg className="w-3.5 h-3.5 text-slate-400 group-hover:text-rose-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-3.5 h-3.5 text-ink-tertiary group-hover:text-negative transition-colors duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                 </svg>
                 Limpiar Todo
-                <kbd className="px-1 py-0.2 bg-slate-50 border border-slate-200 rounded font-mono text-[8px] text-slate-400 ml-1">ESC</kbd>
+                <kbd className="px-1 py-0.2 bg-inset border border-edge text-ink-tertiary rounded font-mono text-[8px] ml-1">ESC</kbd>
               </button>
             </div>
           </div>
         </div>
 
         {/* COLUMNA 2 (CENTRAL - CATÁLOGO): Grilla de Productos Rápidos por Categoría (Se oculta en pantallas angostas/cuadradas para evitar roturas) */}
-        <div className="flex flex-1 min-w-[240px] max-w-[500px] bg-white rounded-3xl border border-slate-200/80 p-4 shadow-sm overflow-hidden flex-col">
+        <div className="flex flex-1 min-w-[240px] max-w-[500px] bg-surface rounded-xl border border-edge p-4 shadow-card overflow-hidden flex-col transition-all duration-200 ease-expo">
 
-          
           {/* Buscador de código de barras / manual */}
           <div className="relative mb-3">
             <ProductFinder inputRef={searchInputRef} />
-            <span className="absolute right-4 top-3 text-[9px] font-extrabold bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded border border-slate-200 pointer-events-none">
+            <span className="absolute right-4 top-3 text-[9px] font-extrabold bg-inset text-ink-tertiary px-1.5 py-0.5 rounded border border-edge pointer-events-none font-mono">
               F8
             </span>
           </div>
 
           {/* Selector de Categorías */}
-          <div className="flex items-center gap-2 border-b border-slate-100 pb-3 mb-4 overflow-x-auto">
+          <div className="flex items-center gap-2 border-b border-edge pb-3 mb-4 overflow-x-auto scrollbar-none">
             {categorias.map((cat) => (
               <button
                 key={cat}
                 onClick={() => setCategoriaActiva(cat)}
-                className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all cursor-pointer ${
+                className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all duration-200 ease-expo cursor-pointer active:scale-[0.98] ${
                   categoriaActiva === cat
-                    ? 'bg-slate-900 text-white shadow-sm'
-                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200/70 hover:text-slate-800'
+                    ? 'bg-ink text-ink-inverted shadow-card'
+                    : 'bg-inset text-ink-secondary hover:bg-surface hover:text-ink border border-edge'
                 }`}
               >
                 {cat}
@@ -636,19 +635,19 @@ export function CashRegister() {
                 <button
                   key={item.name}
                   onClick={() => handleQuickSuggestion(item.name)}
-                  className="p-4 rounded-2xl border text-center flex flex-col items-center justify-center h-28 transition-all relative cursor-pointer bg-amber-50/50 border-amber-200/80 hover:bg-amber-100 hover:border-amber-500 hover:shadow-md active:scale-95"
+                  className="p-4 rounded-xl border text-center flex flex-col items-center justify-center h-28 transition-all duration-200 ease-expo relative cursor-pointer bg-brand-subtle/30 border-brand/20 hover:bg-brand-subtle hover:border-brand hover:shadow-panel active:scale-[0.98] group"
                 >
                   {getItemIcon(item.name)}
-                  <span className="text-xs font-black text-slate-800 leading-snug">{item.name}</span>
+                  <span className="text-xs font-black text-ink leading-snug group-hover:text-brand transition-colors duration-200">{item.name}</span>
                 </button>
               ))
             ) : productosFiltrados.length === 0 ? (
-              <div className="col-span-full flex flex-col items-center justify-center py-16 text-center text-slate-400">
-                <svg className="h-8 w-8 mb-3 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="col-span-full flex flex-col items-center justify-center py-16 text-center text-ink-tertiary">
+                <svg className="h-8 w-8 mb-3 text-ink-tertiary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
                 </svg>
                 <p className="text-xs font-bold uppercase tracking-wider">No hay productos en {categoriaActiva}</p>
-                <p className="text-[11px] text-slate-400 mt-1">Registrá productos con esta categoría en Inventario.</p>
+                <p className="text-[11px] text-ink-tertiary mt-1">Registrá productos con esta categoría en Inventario.</p>
               </div>
             ) : (
               productosFiltrados.map((prod) => {
@@ -669,31 +668,31 @@ export function CashRegister() {
                       });
                     }}
                     className={`
-                      p-4.5 rounded-2xl border text-left flex flex-col justify-between h-28 transition-all relative cursor-pointer group select-none
+                      p-4.5 rounded-xl border text-left flex flex-col justify-between h-28 transition-all duration-200 ease-expo relative cursor-pointer group select-none active:scale-[0.98]
                       ${isOutOfStock
-                        ? 'bg-slate-50 border-slate-200/50 opacity-40 cursor-not-allowed'
-                        : 'bg-slate-50/50 border-slate-200/80 hover:bg-white hover:border-orange-500 hover:shadow-md active:scale-95'
+                        ? 'bg-inset border-edge opacity-40 cursor-not-allowed'
+                        : 'bg-inset border-edge hover:bg-surface hover:border-brand hover:shadow-panel'
                       }
                     `}
                   >
                     <div>
-                      <span className="text-xs font-black text-slate-800 leading-snug block line-clamp-2 group-hover:text-orange-800 transition-colors">
+                      <span className="text-xs font-black text-ink leading-snug block line-clamp-2 group-hover:text-brand transition-colors duration-200">
                         {prod.nombre}
                       </span>
-                      <span className="text-[9px] font-mono text-slate-400 mt-1 block">Cod: {prod.codigo}</span>
+                      <span className="text-[9px] font-mono text-ink-tertiary mt-1 block">Cod: {prod.codigo}</span>
                     </div>
 
-                    <div className="flex items-center justify-between mt-2 border-t border-slate-100 pt-2 w-full">
-                      <span className="font-mono text-sm font-black text-orange-600">
+                    <div className="flex items-center justify-between mt-2 border-t border-edge pt-2 w-full transition-colors duration-200">
+                      <span className="font-mono text-sm font-black text-brand">
                         S/ {prod.precio_venta.toFixed(2)}
                       </span>
 
                       <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md ${
                         isOutOfStock
-                          ? 'bg-rose-100 text-rose-800'
+                          ? 'bg-negative-subtle text-negative-text'
                           : isLow
-                            ? 'bg-amber-100 text-amber-800'
-                            : 'bg-slate-200/60 text-slate-600'
+                            ? 'bg-caution-subtle text-caution-text'
+                            : 'bg-inset text-ink-secondary border border-edge'
                       }`}>
                         {isOutOfStock ? 'Agotado' : `Stock: ${prod.stock}`}
                       </span>
@@ -706,56 +705,56 @@ export function CashRegister() {
         </div>
 
         {/* COLUMNA 3 (DERECHA - CAJA & AUDITORÍA): Totales, Liquidación y Cierre de Caja */}
-        <div className="relative w-[320px] xl:w-[360px] 2xl:w-[420px] rounded-3xl flex flex-col flex-shrink-0">
-          <div className="bg-white rounded-3xl border border-slate-200/80 shadow-md flex flex-col justify-between overflow-y-auto h-full p-4">
+        <div className="relative w-[320px] xl:w-[360px] 2xl:w-[420px] rounded-xl flex flex-col flex-shrink-0 transition-all duration-200 ease-expo">
+          <div className="bg-surface rounded-xl border border-edge shadow-panel flex flex-col justify-between overflow-y-auto h-full p-4 scrollbar-thin">
           
           {/* Botón flotante Arqueo */}
           <button
             type="button"
             onClick={() => setShowArqueoModal(true)}
-            className="absolute -top-3 -right-3 w-10 h-10 bg-orange-500 text-white rounded-full flex items-center justify-center shadow-lg hover:shadow-xl hover:scale-110 hover:bg-orange-600 transition-all z-20 group cursor-pointer"
+            className="absolute -top-3 -right-3 w-10 h-10 bg-brand text-ink-inverted rounded-full flex items-center justify-center shadow-float hover:shadow-modal hover:scale-110 hover:bg-brand-hover transition-all duration-200 ease-spring z-20 group cursor-pointer"
           >
-            <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-5 h-5 text-ink-inverted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
             </svg>
-            <span className="absolute -top-10 right-0 w-max bg-slate-800 text-white text-[10px] font-bold px-3 py-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-md">
+            <span className="absolute -top-10 right-0 w-max bg-ink text-ink-inverted text-[10px] font-bold px-3 py-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none shadow-panel">
               Arqueo financiero en tiempo real
             </span>
           </button>
           <div className="flex flex-col">
-            <h2 className="text-sm font-black text-slate-800 pb-2 border-b border-slate-100 uppercase tracking-wider flex justify-between items-center">
+            <h2 className="text-sm font-black text-ink pb-2 border-b border-edge uppercase tracking-wider flex justify-between items-center transition-colors duration-200">
               <span>Liquidación de Caja</span>
-              <kbd className="px-1.5 py-0.5 bg-slate-100 border border-slate-300 rounded font-mono text-[8px] text-slate-500 shadow-sm">F9</kbd>
+              <kbd className="px-1.5 py-0.5 bg-inset border border-edge rounded font-mono text-[8px] text-ink-tertiary shadow-card">F9</kbd>
             </h2>
 
             {/* Fila de Totales */}
-            <div className="flex flex-col gap-2 bg-slate-50/50 p-3.5 rounded-2xl border border-slate-200/50">
-              <div className="flex justify-between text-xs font-bold text-slate-500">
+            <div className="flex flex-col gap-2 bg-inset p-3.5 rounded-xl border border-edge mt-3 transition-all duration-200">
+              <div className="flex justify-between text-xs font-bold text-ink-secondary">
                 <span>Subtotal</span>
-                <span className="font-mono text-slate-800 font-bold">S/ {subtotal.toFixed(2)}</span>
+                <span className="font-mono text-ink font-bold">S/ {subtotal.toFixed(2)}</span>
               </div>
               
               {descuentoTotal > 0 && (
-                <div className="flex justify-between text-xs text-orange-600 font-bold">
+                <div className="flex justify-between text-xs text-brand font-bold">
                   <span>Descuento aplicado</span>
                   <span className="font-mono">-S/ {descuentoTotal.toFixed(2)}</span>
                 </div>
               )}
 
-              <div className="flex flex-col gap-0.5 border-t border-slate-200/60 pt-3">
-                <span className="text-[10px] uppercase tracking-wider text-slate-400 font-black">Total a Cobrar</span>
-                <span className="text-3xl font-black font-mono text-orange-600 tracking-tight leading-none mt-1">
+              <div className="flex flex-col gap-0.5 border-t border-edge pt-3 mt-1">
+                <span className="text-[10px] uppercase tracking-wider text-ink-tertiary font-black">Total a Cobrar</span>
+                <span className="text-3xl font-black font-mono text-brand tracking-tight leading-none mt-1">
                   S/ {total.toFixed(2)}
                 </span>
               </div>
             </div>
 
             {/* Método de Pago Selector */}
-            <div className="flex flex-col gap-1.5 pt-1">
-              <label className="text-[10px] font-black text-slate-400 uppercase tracking-wider">
+            <div className="flex flex-col gap-1.5 pt-3 transition-all duration-200">
+              <label className="text-[10px] font-black text-ink-tertiary uppercase tracking-wider">
                 Método de Pago:
               </label>
-              <div className="grid grid-cols-2 gap-2 bg-slate-100 p-1 rounded-xl border border-slate-200/50">
+              <div className="grid grid-cols-2 gap-2 bg-inset p-1 rounded-xl border border-edge">
                 <button
                   type="button"
                   onClick={() => {
@@ -763,10 +762,10 @@ export function CashRegister() {
                     setMontoPago('');
                     setCambio(0);
                   }}
-                  className={`py-2 text-xs font-bold rounded-lg cursor-pointer transition-all flex items-center justify-center gap-1.5 ${
+                  className={`py-2 text-xs font-bold rounded-lg cursor-pointer transition-all duration-200 ease-expo active:scale-[0.98] flex items-center justify-center gap-1.5 ${
                     metodoPago === 'efectivo'
-                      ? 'bg-white text-slate-800 shadow-sm border border-slate-200/40'
-                      : 'text-slate-500 hover:text-slate-700'
+                      ? 'bg-surface text-ink shadow-card border border-edge'
+                      : 'text-ink-secondary hover:text-ink'
                   }`}
                 >
                   <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -781,10 +780,10 @@ export function CashRegister() {
                     setMontoPago(total.toFixed(2));
                     setCambio(0);
                   }}
-                  className={`py-2 text-xs font-bold rounded-lg cursor-pointer transition-all flex items-center justify-center gap-1.5 ${
+                  className={`py-2 text-xs font-bold rounded-lg cursor-pointer transition-all duration-200 ease-expo active:scale-[0.98] flex items-center justify-center gap-1.5 ${
                     metodoPago === 'billetera_digital'
-                      ? 'bg-white text-slate-800 shadow-sm border border-slate-200/40'
-                      : 'text-slate-500 hover:text-slate-700'
+                      ? 'bg-surface text-ink shadow-card border border-edge'
+                      : 'text-ink-secondary hover:text-ink'
                   }`}
                 >
                   <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -797,17 +796,17 @@ export function CashRegister() {
 
             {/* Renderizar según método de pago */}
             {metodoPago === 'efectivo' ? (
-              <>
+              <div className="flex flex-col gap-3 mt-3 transition-all duration-200 ease-expo">
                 {/* Input de Efectivo del Cliente */}
                 <div className="flex flex-col gap-1.5">
                   <div className="flex justify-between items-center">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-wider">
+                    <label className="text-[10px] font-black text-ink-tertiary uppercase tracking-wider">
                       Efectivo Recibido (Paga con):
                     </label>
-                    <kbd className="px-1.5 py-0.5 bg-slate-50 border border-slate-300 rounded font-mono text-[8px] text-slate-500 shadow-sm">F9</kbd>
+                    <kbd className="px-1.5 py-0.5 bg-inset border border-edge rounded font-mono text-[8px] text-ink-tertiary shadow-card">F9</kbd>
                   </div>
                   <div className="relative flex items-center">
-                    <span className="absolute left-4 font-mono font-bold text-slate-400 text-lg">S/</span>
+                    <span className="absolute left-4 font-mono font-bold text-ink-tertiary text-lg">S/</span>
                     <input
                       name="monto-pago"
                       type="number"
@@ -815,8 +814,8 @@ export function CashRegister() {
                       onChange={(e) => setMontoPago(e.target.value)}
                       placeholder="0.00"
                       className="
-                        w-full rounded-2xl border border-slate-200 bg-slate-50 py-3.5 pl-10 pr-4 font-mono text-lg font-bold text-slate-800
-                        outline-none focus:border-orange-500 focus:bg-white focus:ring-4 focus:ring-orange-500/10 transition-all shadow-sm
+                        w-full rounded-xl border border-edge bg-inset py-3.5 pl-10 pr-4 font-mono text-lg font-bold text-ink
+                        outline-none focus:border-brand focus:bg-surface focus:ring-4 focus:ring-brand/10 transition-all duration-200 ease-expo shadow-card
                       "
                     />
                   </div>
@@ -829,7 +828,7 @@ export function CashRegister() {
                         setMontoPago(total.toFixed(2));
                         setTimeout(() => document.querySelector<HTMLInputElement>('input[name="monto-pago"]')?.focus(), 50);
                       }}
-                      className="py-2 px-1 bg-orange-50 hover:bg-orange-100 text-[10px] font-black text-orange-700 border border-orange-200/50 rounded-xl transition-all cursor-pointer text-center shadow-sm"
+                      className="py-2 px-1 bg-brand-subtle hover:bg-brand-subtle/80 text-[10px] font-black text-brand-text border border-brand/20 rounded-xl transition-all duration-200 ease-expo cursor-pointer text-center shadow-card active:scale-[0.95]"
                     >
                       Exacto
                     </button>
@@ -841,7 +840,7 @@ export function CashRegister() {
                           setMontoPago(bill.toFixed(2));
                           setTimeout(() => document.querySelector<HTMLInputElement>('input[name="monto-pago"]')?.focus(), 50);
                         }}
-                        className="py-2 px-1 bg-slate-100 hover:bg-slate-200 text-[10px] font-mono font-black text-slate-700 border border-slate-200/80 rounded-xl transition-all cursor-pointer text-center shadow-sm"
+                        className="py-2 px-1 bg-inset hover:bg-surface text-[10px] font-mono font-black text-ink border border-edge rounded-xl transition-all duration-200 ease-expo cursor-pointer text-center shadow-card active:scale-[0.95]"
                       >
                         S/ {bill}
                       </button>
@@ -851,18 +850,18 @@ export function CashRegister() {
 
                 {/* Vuelto a Entregar */}
                 {parseFloat(montoPago) > 0 && (
-                  <div className="rounded-2xl bg-orange-50 border border-orange-100 p-3 flex justify-between items-center shadow-sm">
-                    <span className="text-[10px] font-bold text-orange-800 uppercase tracking-wider">Vuelto a entregar:</span>
-                    <span className="text-xl font-black font-mono text-orange-600">
+                  <div className="rounded-xl bg-brand-subtle border border-brand/20 p-3 flex justify-between items-center shadow-card transition-all duration-200 ease-expo">
+                    <span className="text-[10px] font-bold text-brand-text uppercase tracking-wider">Vuelto a entregar:</span>
+                    <span className="text-xl font-black font-mono text-brand">
                       S/ {cambio.toFixed(2)}
                     </span>
                   </div>
                 )}
-              </>
+              </div>
             ) : (
-              <div className="flex flex-col gap-2 p-3.5 bg-slate-50 border border-slate-200/70 rounded-2xl">
+              <div className="flex flex-col gap-2.5 p-3.5 bg-inset border border-edge rounded-xl mt-3 transition-all duration-200 ease-expo">
                 <div className="flex justify-between items-center">
-                  <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+                  <label className="text-[10px] font-bold text-ink-secondary uppercase tracking-wider">
                     Destino:
                   </label>
                   <button
@@ -872,7 +871,7 @@ export function CashRegister() {
                       setSaldoInicialNuevaCuenta('0');
                       setShowNuevaCuentaModal(true);
                     }}
-                    className="text-[9px] font-black text-orange-600 hover:text-orange-800 cursor-pointer flex items-center bg-orange-50 px-2 py-1 rounded-md border border-orange-100"
+                    className="text-[9px] font-black text-brand-text hover:brightness-105 cursor-pointer flex items-center bg-brand-subtle px-2 py-1 rounded-lg border border-brand/20 transition-all duration-200 active:scale-[0.95]"
                   >
                     <span>+ Nueva Cuenta</span>
                   </button>
@@ -881,7 +880,7 @@ export function CashRegister() {
                 <select
                   value={cuentaDigitalSeleccionadaId}
                   onChange={(e) => setCuentaDigitalSeleccionadaId(e.target.value)}
-                  className="w-full rounded-xl border border-slate-200 bg-white py-2 px-3 text-xs font-bold text-slate-700 focus:outline-none focus:border-orange-500 cursor-pointer"
+                  className="w-full rounded-xl border border-edge bg-surface py-2.5 px-3 text-xs font-bold text-ink focus:outline-none focus:border-brand focus:ring-1 focus:ring-brand/20 cursor-pointer transition-all duration-200"
                 >
                   {cuentasBilletera.map((cta) => (
                     <option key={cta.id} value={cta.id}>
@@ -902,10 +901,10 @@ export function CashRegister() {
               onClick={handleProcessCheckout}
               disabled={isProcessing || items.length === 0}
               className={`
-                w-full py-3 rounded-2xl font-black text-xs uppercase tracking-wider transition-all duration-300 cursor-pointer
+                w-full py-3.5 rounded-xl font-black text-xs uppercase tracking-wider transition-all duration-200 ease-expo cursor-pointer active:scale-[0.98]
                 ${isProcessing || items.length === 0
-                  ? 'bg-slate-100 text-slate-400 cursor-not-allowed border border-slate-200/50'
-                  : 'bg-gradient-to-r from-orange-600 to-amber-600 text-white hover:brightness-105 shadow-md shadow-orange-600/10 active:scale-95'
+                  ? 'bg-inset text-ink-tertiary cursor-not-allowed border border-edge'
+                  : 'bg-brand hover:bg-brand-hover text-ink-inverted shadow-panel'
                 }
               `}
             >
@@ -920,29 +919,29 @@ export function CashRegister() {
          MODAL INTERACTIVO: APERTURA DE CAJA
          ========================================================================= */}
       {showAperturaModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm">
-          <div className="w-[420px] rounded-3xl border border-slate-200/80 bg-white p-7 shadow-2xl animate-in zoom-in-95 duration-200">
-            <h2 className="text-xl font-black text-slate-800 mb-1.5 tracking-tight">Apertura de Caja Obligatoria</h2>
-            <p className="text-xs text-slate-500 mb-5 leading-relaxed">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-overlay backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="w-[420px] rounded-2xl border border-edge bg-surface p-7 shadow-modal animate-in zoom-in-95 duration-200">
+            <h2 className="text-xl font-black text-ink mb-1.5 tracking-tight">Apertura de Caja Obligatoria</h2>
+            <p className="text-xs text-ink-secondary mb-5 leading-relaxed">
               No hay una caja activa abierta. Ingresá el monto de sencillo inicial en soles para habilitar las ventas de hoy. Las billeteras digitales iniciarán estrictamente en cero.
             </p>
 
             <div className="flex flex-col gap-1.5 mb-5">
-              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Monto Inicial Sencillo:</label>
+              <label className="text-[10px] font-black text-ink-tertiary uppercase tracking-wider">Monto Inicial Sencillo:</label>
               <div className="relative flex items-center">
-                <span className="absolute left-4 font-mono font-bold text-slate-400 text-lg">S/</span>
+                <span className="absolute left-4 font-mono font-bold text-ink-tertiary text-lg">S/</span>
                 <input
                   type="number"
                   value={montoAperturaInput}
                   onChange={(e) => setMontoAperturaInput(e.target.value)}
-                  className="w-full rounded-2xl border border-slate-200 bg-slate-50 py-3.5 pl-10 pr-4 font-mono text-lg font-bold text-slate-800 focus:outline-none focus:border-orange-500 focus:bg-white focus:ring-4 focus:ring-orange-500/10 transition-all"
+                  className="w-full rounded-xl border border-edge bg-inset py-3.5 pl-10 pr-4 font-mono text-lg font-bold text-ink focus:outline-none focus:border-brand focus:bg-surface focus:ring-4 focus:ring-brand/10 transition-all duration-200 ease-expo"
                 />
               </div>
             </div>
 
             <button
               onClick={handleAbrirCaja}
-              className="w-full bg-gradient-to-r from-orange-600 to-amber-600 py-3.5 rounded-2xl font-black text-white text-xs uppercase tracking-wider hover:brightness-105 transition-all duration-300 shadow-md shadow-orange-600/10 cursor-pointer"
+              className="w-full bg-brand hover:bg-brand-hover py-3.5 rounded-xl font-black text-ink-inverted text-xs uppercase tracking-wider transition-all duration-200 ease-expo cursor-pointer active:scale-[0.98] shadow-panel"
             >
               Abrir Caja y Habilitar Ventas
             </button>
@@ -954,33 +953,33 @@ export function CashRegister() {
          MODAL INTERACTIVO: CIERRE DE CAJA DIARIA (ARQUEO FISICO)
          ========================================================================= */}
       {showCierreModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm">
-          <div className="w-[440px] rounded-3xl border border-slate-200/80 bg-white p-6.5 shadow-2xl animate-in zoom-in-95 duration-200">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-overlay backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="w-[440px] rounded-2xl border border-edge bg-surface p-6.5 shadow-modal animate-in zoom-in-95 duration-200">
             <div className="flex justify-between items-center mb-1.5">
-              <h2 className="text-lg font-black text-slate-800 tracking-tight">Cierre y Arqueo de Caja Diaria</h2>
-              <span className="text-[9px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full font-black uppercase">Auditoría</span>
+              <h2 className="text-lg font-black text-ink tracking-tight">Cierre y Arqueo de Caja Diaria</h2>
+              <span className="text-[9px] bg-brand-subtle text-brand-text border border-brand/20 px-2.5 py-0.5 rounded-full font-black uppercase">Auditoría</span>
             </div>
-            <p className="text-xs text-slate-500 mb-4 leading-relaxed font-semibold">
+            <p className="text-xs text-ink-secondary mb-4 leading-relaxed font-semibold">
               Declaración del arqueo físico de billetes y monedas en la gaveta. Se contrastará con los movimientos computados por la terminal.
             </p>
 
             <div className="flex flex-col gap-3.5 mb-5">
               {/* Saldo Esperado Computado */}
-              <div className="p-3.5 bg-slate-50 rounded-2xl border border-slate-200/50 flex justify-between items-center">
-                <span className="text-xs font-bold text-slate-500">Saldo Físico Esperado:</span>
-                <span className="text-lg font-black font-mono text-slate-800">S/ {efectivoCajaFisica.toFixed(2)}</span>
+              <div className="p-3.5 bg-inset rounded-xl border border-edge flex justify-between items-center">
+                <span className="text-xs font-bold text-ink-secondary">Saldo Físico Esperado:</span>
+                <span className="text-lg font-black font-mono text-ink">S/ {efectivoCajaFisica.toFixed(2)}</span>
               </div>
 
               {/* Input Declaración Física */}
               <div className="flex flex-col gap-1.5">
-                <label className="text-[10px] font-black text-slate-500 uppercase tracking-wider">Efectivo Físico Real Declarado (Caja):</label>
+                <label className="text-[10px] font-black text-ink-secondary uppercase tracking-wider">Efectivo Físico Real Declarado (Caja):</label>
                 <div className="relative flex items-center">
-                  <span className="absolute left-4 font-mono font-bold text-slate-400 text-lg">S/</span>
+                  <span className="absolute left-4 font-mono font-bold text-ink-tertiary text-lg">S/</span>
                   <input
                     type="number"
                     value={efectivoDeclaradoInput}
                     onChange={(e) => setEfectivoDeclaradoInput(e.target.value)}
-                    className="w-full rounded-2xl border border-slate-300 bg-slate-50/50 py-3.5 pl-10 pr-4 font-mono text-lg font-bold text-slate-800 focus:outline-none focus:border-orange-600 focus:bg-white focus:ring-4 focus:ring-orange-600/10 transition-all"
+                    className="w-full rounded-xl border border-edge bg-inset py-3.5 pl-10 pr-4 font-mono text-lg font-bold text-ink focus:outline-none focus:border-brand focus:bg-surface focus:ring-4 focus:ring-brand/10 transition-all duration-200 ease-expo"
                     placeholder="0.00"
                   />
                 </div>
@@ -991,12 +990,12 @@ export function CashRegister() {
                 (() => {
                   const dif = (parseFloat(efectivoDeclaradoInput) || 0) - efectivoCajaFisica;
                   return (
-                    <div className={`p-3.5 rounded-2xl border flex justify-between items-center shadow-sm ${
+                    <div className={`p-3.5 rounded-xl border flex justify-between items-center shadow-card transition-all duration-200 ease-expo ${
                       Math.abs(dif) < 0.01 
-                        ? 'bg-orange-50 border-orange-200 text-orange-800' 
+                        ? 'bg-brand-subtle border-brand/20 text-brand-text' 
                         : dif > 0 
-                          ? 'bg-amber-50 border-amber-200 text-amber-800' 
-                          : 'bg-rose-50 border-rose-200 text-rose-800'
+                          ? 'bg-caution-subtle border-caution/20 text-caution-text' 
+                          : 'bg-negative-subtle border-negative/20 text-negative-text'
                     }`}>
                       <span className="text-xs font-black uppercase">
                         {Math.abs(dif) < 0.01 
@@ -1018,7 +1017,7 @@ export function CashRegister() {
               <button
                 type="button"
                 onClick={() => setShowCierreModal(false)}
-                className="w-1/2 bg-slate-100 hover:bg-slate-200 py-3.5 rounded-2xl font-black text-slate-600 text-xs uppercase tracking-wider transition-colors cursor-pointer"
+                className="w-1/2 bg-inset hover:bg-surface border border-edge py-3.5 rounded-xl font-black text-ink-secondary text-xs uppercase tracking-wider transition-colors duration-200 cursor-pointer text-center active:scale-[0.98]"
               >
                 Volver
               </button>
@@ -1026,9 +1025,9 @@ export function CashRegister() {
               <button
                 type="button"
                 onClick={handleConfirmarCierre}
-                className="w-1/2 bg-slate-900 hover:bg-slate-800 py-3.5 rounded-2xl font-black text-white text-xs uppercase tracking-wider transition-all cursor-pointer shadow-md flex items-center justify-center gap-1.5"
+                className="w-1/2 bg-ink hover:bg-ink/90 py-3.5 rounded-xl font-black text-ink-inverted text-xs uppercase tracking-wider transition-all duration-200 ease-expo cursor-pointer shadow-panel flex items-center justify-center gap-1.5 active:scale-[0.98]"
               >
-                <svg className="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-3.5 h-3.5 text-ink-inverted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                 </svg>
                 Confirmar y Cerrar Caja
@@ -1042,78 +1041,78 @@ export function CashRegister() {
          MODAL INTERACTIVO: REPORTE DE AUDITORÍA DE CIERRE DE CAJA
          ========================================================================= */}
       {showCierreReport && cierreReportData && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm">
-          <div className="w-[450px] rounded-3xl border border-slate-200 bg-white p-6 shadow-2xl animate-in zoom-in-95 duration-200 flex flex-col max-h-[85vh]">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-overlay backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="w-[450px] rounded-2xl border border-edge bg-surface p-6 shadow-modal animate-in zoom-in-95 duration-200 flex flex-col max-h-[85vh]">
             <div className="flex justify-between items-center mb-3">
-              <h2 className="text-base font-black text-slate-800 uppercase tracking-tight flex items-center gap-1.5">
-                <svg className="w-4 h-4 text-slate-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <h2 className="text-base font-black text-ink uppercase tracking-tight flex items-center gap-1.5">
+                <svg className="w-4 h-4 text-ink" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
                 <span>Reporte Auditoría de Cierre</span>
               </h2>
-              <span className="text-[9px] bg-slate-900 text-orange-400 border border-slate-800 px-2.5 py-0.5 rounded-full font-black uppercase">
+              <span className="text-[9px] bg-ink text-brand border border-edge-strong px-2.5 py-0.5 rounded-full font-black uppercase tracking-wider">
                 EMITIDO
               </span>
             </div>
 
-            <div className="flex-1 overflow-y-auto bg-slate-50 border border-slate-200/50 p-4.5 rounded-2xl font-mono text-xs flex flex-col gap-3 text-slate-700 shadow-inner">
-              <div className="text-center font-black text-slate-900 border-b border-dashed border-slate-300 pb-2 mb-1">
+            <div className="flex-1 overflow-y-auto bg-inset border border-edge p-4.5 rounded-xl font-mono text-xs flex flex-col gap-3 text-ink-secondary shadow-inner scrollbar-thin">
+              <div className="text-center font-black text-ink border-b border-dashed border-edge pb-2 mb-1">
                 BOOM POS - CIERRE DIARIO
-                <div className="text-[10px] text-slate-400 font-bold uppercase mt-1">EMPORIO Y MULTICANALES</div>
+                <div className="text-[10px] text-ink-tertiary font-bold uppercase mt-1">EMPORIO Y MULTICANALES</div>
               </div>
 
               <div className="flex justify-between">
                 <span>Fecha Apertura:</span>
-                <span className="font-bold text-slate-900">{new Date(cierreReportData.fechaApertura).toLocaleString()}</span>
+                <span className="font-bold text-ink">{new Date(cierreReportData.fechaApertura).toLocaleString()}</span>
               </div>
               <div className="flex justify-between">
                 <span>Fecha Cierre:</span>
-                <span className="font-bold text-slate-900">{new Date(cierreReportData.fechaCierre).toLocaleString()}</span>
+                <span className="font-bold text-ink">{new Date(cierreReportData.fechaCierre).toLocaleString()}</span>
               </div>
 
-              <div className="border-t border-dashed border-slate-200 my-1"></div>
+              <div className="border-t border-dashed border-edge my-1"></div>
 
               <div className="flex justify-between">
                 <span>Saldo Apertura (Efectivo):</span>
-                <span className="font-bold text-slate-900">S/ {cierreReportData.montoApertura.toFixed(2)}</span>
+                <span className="font-bold text-ink">S/ {cierreReportData.montoApertura.toFixed(2)}</span>
               </div>
               <div className="flex justify-between">
                 <span>Ventas Efectivo (+):</span>
-                <span className="font-bold text-slate-900">S/ {cierreReportData.ventasEfectivo.toFixed(2)}</span>
+                <span className="font-bold text-ink">S/ {cierreReportData.ventasEfectivo.toFixed(2)}</span>
               </div>
-              <div className="flex justify-between text-rose-600">
+              <div className="flex justify-between text-negative">
                 <span>Gastos/Egresos Efectivo (-):</span>
                 <span className="font-bold">-S/ {cierreReportData.egresosEfectivo.toFixed(2)}</span>
               </div>
 
-              <div className="border-t border-dashed border-slate-200 my-1"></div>
+              <div className="border-t border-dashed border-edge my-1"></div>
 
-              <div className="flex justify-between bg-slate-200/50 p-1.5 rounded font-black text-slate-900">
+              <div className="flex justify-between bg-surface border border-edge p-1.5 rounded font-black text-ink shadow-card">
                 <span>Saldo Efectivo Esperado:</span>
                 <span>S/ {cierreReportData.saldoFinalEfectivo.toFixed(2)}</span>
               </div>
 
-              <div className="border-t border-dashed border-slate-200 my-1"></div>
+              <div className="border-t border-dashed border-edge my-1"></div>
 
-              <div className="font-black text-slate-900">Saldos Billeteras (Cierre a 0):</div>
+              <div className="font-black text-ink">Saldos Billeteras (Cierre a 0):</div>
               {Object.entries(cierreReportData.saldoFinalBilleteras).map(([id, saldo]: any) => {
                 const cta = cuentasBilletera.find(c => c.id === id) || { nombre: id };
                 return (
-                  <div key={id} className="flex justify-between pl-3 text-slate-600">
+                  <div key={id} className="flex justify-between pl-3 text-ink-secondary">
                     <span>• {cta.nombre}:</span>
-                    <span className="font-bold text-orange-600">S/ {saldo.toFixed(2)}</span>
+                    <span className="font-bold text-brand">S/ {saldo.toFixed(2)}</span>
                   </div>
                 );
               })}
 
-              <div className="border-t border-dashed border-slate-300 my-1"></div>
+              <div className="border-t border-dashed border-edge my-1"></div>
 
-              <div className="flex justify-between font-black text-slate-900 bg-slate-900 text-orange-400 p-2 rounded">
+              <div className="flex justify-between font-black text-brand bg-ink p-2 rounded shadow-panel">
                 <span>Total Recaudado Neto:</span>
                 <span>S/ {cierreReportData.totalNeto.toFixed(2)}</span>
               </div>
 
-              <div className="text-[10px] text-slate-400 font-bold uppercase mt-2 text-center">
+              <div className="text-[10px] text-ink-tertiary font-bold uppercase mt-2 text-center">
                 * Billeteras reseteadas a S/0.00 para la próxima jornada contable.
               </div>
             </div>
@@ -1125,7 +1124,7 @@ export function CashRegister() {
                 // Forzar re-enfoque de apertura al cerrar
                 setShowAperturaModal(true);
               }}
-              className="w-full mt-4 bg-slate-900 hover:bg-slate-800 py-3.5 rounded-2xl font-black text-white text-xs uppercase tracking-wider transition-all duration-300 cursor-pointer shadow-md"
+              className="w-full mt-4 bg-ink hover:bg-ink/90 py-3.5 rounded-xl font-black text-ink-inverted text-xs uppercase tracking-wider transition-all duration-200 ease-expo cursor-pointer active:scale-[0.98] shadow-panel"
             >
               Confirmar y Aceptar Cierre
             </button>
@@ -1137,23 +1136,23 @@ export function CashRegister() {
          MODAL INTERACTIVO: SIMULADOR DE TICKET TÉRMICO
          ========================================================================= */}
       {showTicketModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm">
-          <div className="w-[380px] max-h-[85vh] rounded-3xl border border-slate-200 bg-white p-5 shadow-2xl animate-in zoom-in-95 duration-200 flex flex-col">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-overlay backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="w-[380px] max-h-[85vh] rounded-2xl border border-edge bg-surface p-5 shadow-modal animate-in zoom-in-95 duration-200 flex flex-col">
             <div className="flex justify-between items-center mb-3">
-              <h2 className="text-base font-extrabold text-slate-800 flex items-center gap-1.5">
-                <svg className="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <h2 className="text-base font-extrabold text-ink flex items-center gap-1.5">
+                <svg className="w-4 h-4 text-positive" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
                 Venta Exitosa
               </h2>
-              <span className="text-[9px] bg-orange-50 text-orange-700 border border-orange-200 px-2.5 py-0.5 rounded-full font-black uppercase">
+              <span className="text-[9px] bg-brand-subtle text-brand-text border border-brand/20 px-2.5 py-0.5 rounded-full font-black uppercase tracking-wider">
                 IMPRESO 58MM
               </span>
             </div>
 
             <pre className="
-              flex-1 rounded-2xl bg-slate-50 text-slate-800 p-4 font-mono text-[10px] overflow-y-auto shadow-inner leading-normal
-              border-t-8 border-b-8 border-dashed border-slate-200
+              flex-1 rounded-xl bg-inset text-ink p-4 font-mono text-[10px] overflow-y-auto shadow-inner leading-normal
+              border-t-8 border-b-8 border-dashed border-edge scrollbar-thin
             ">
               {generatedTicket}
             </pre>
@@ -1163,7 +1162,7 @@ export function CashRegister() {
                 setShowTicketModal(false);
                 setGeneratedTicket('');
               }}
-              className="w-full mt-4 bg-slate-800 hover:bg-slate-900 py-3.5 rounded-2xl font-bold text-white text-xs uppercase tracking-wider transition-all duration-300 cursor-pointer"
+              className="w-full mt-4 bg-ink hover:bg-ink/90 py-3.5 rounded-xl font-bold text-ink-inverted text-xs uppercase tracking-wider transition-all duration-200 ease-expo cursor-pointer active:scale-[0.98] shadow-panel"
             >
               Cerrar y Siguiente Venta
             </button>
@@ -1175,35 +1174,35 @@ export function CashRegister() {
          MODAL INTERACTIVO: NUEVA CUENTA / BILLETERA DIGITAL EN CALIENTE
          ========================================================================= */}
       {showNuevaCuentaModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm">
-          <div className="w-[400px] rounded-3xl border border-slate-200 bg-white p-6 shadow-2xl animate-in zoom-in-95 duration-200">
-            <h2 className="text-lg font-black text-slate-800 mb-1.5 tracking-tight">Agregar Cuenta / Billetera Digital</h2>
-            <p className="text-xs text-slate-400 mb-4 leading-relaxed font-semibold">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-overlay backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="w-[400px] rounded-2xl border border-edge bg-surface p-6 shadow-modal animate-in zoom-in-95 duration-200">
+            <h2 className="text-lg font-black text-ink mb-1.5 tracking-tight">Agregar Cuenta / Billetera Digital</h2>
+            <p className="text-xs text-ink-secondary mb-4 leading-relaxed font-semibold">
               Registrá una nueva cuenta en vivo. Esto te permite separar saldos por banco o pasarela de cobro.
             </p>
 
             <div className="flex flex-col gap-4 mb-5">
               <div className="flex flex-col gap-1.5">
-                <label className="text-[10px] font-black text-slate-500 uppercase tracking-wider">Nombre del canal/banco:</label>
+                <label className="text-[10px] font-black text-ink-tertiary uppercase tracking-wider">Nombre del canal/banco:</label>
                 <input
                   type="text"
                   value={nombreNuevaCuenta}
                   onChange={(e) => setNombreNuevaCuenta(e.target.value)}
                   placeholder="Ej. Yape - Interbank, Plin - Scotiabank"
-                  className="w-full rounded-xl border border-slate-200 bg-slate-50 py-3 px-3.5 text-xs font-bold text-slate-800 focus:outline-none focus:border-orange-500 focus:bg-white focus:ring-4 focus:ring-orange-500/5 transition-all"
+                  className="w-full rounded-lg border border-edge bg-inset py-3 px-3.5 text-xs font-bold text-ink focus:outline-none focus:border-brand focus:bg-surface focus:ring-4 focus:ring-brand/5 transition-all duration-200 ease-expo"
                 />
               </div>
 
               <div className="flex flex-col gap-1.5">
-                <label className="text-[10px] font-black text-slate-500 uppercase tracking-wider">Saldo Inicial (S/):</label>
+                <label className="text-[10px] font-black text-ink-tertiary uppercase tracking-wider">Saldo Inicial (S/):</label>
                 <div className="relative flex items-center">
-                  <span className="absolute left-3.5 font-mono font-bold text-slate-400 text-xs">S/</span>
+                  <span className="absolute left-3.5 font-mono font-bold text-ink-tertiary text-xs">S/</span>
                   <input
                     type="number"
                     value={saldoInicialNuevaCuenta}
                     onChange={(e) => setSaldoInicialNuevaCuenta(e.target.value)}
                     placeholder="0.00"
-                    className="w-full rounded-xl border border-slate-200 bg-slate-50 py-3 pl-8 pr-3.5 font-mono text-xs font-bold text-slate-800 focus:outline-none focus:border-orange-500 focus:bg-white focus:ring-4 focus:ring-orange-500/5 transition-all"
+                    className="w-full rounded-lg border border-edge bg-inset py-3 pl-8 pr-3.5 font-mono text-xs font-bold text-ink focus:outline-none focus:border-brand focus:bg-surface focus:ring-4 focus:ring-brand/5 transition-all duration-200 ease-expo"
                   />
                 </div>
               </div>
@@ -1213,7 +1212,7 @@ export function CashRegister() {
               <button
                 type="button"
                 onClick={() => setShowNuevaCuentaModal(false)}
-                className="w-1/2 bg-slate-100 hover:bg-slate-200/80 py-3 rounded-xl font-black text-slate-600 text-xs uppercase tracking-wider transition-colors cursor-pointer"
+                className="w-1/2 bg-inset hover:bg-surface border border-edge py-3 rounded-lg font-black text-ink-secondary text-xs uppercase tracking-wider transition-colors duration-200 cursor-pointer text-center active:scale-[0.98]"
               >
                 Cancelar
               </button>
@@ -1239,11 +1238,95 @@ export function CashRegister() {
 
                   setShowNuevaCuentaModal(false);
                 }}
-                className="w-1/2 bg-gradient-to-r from-orange-600 to-amber-600 py-3 rounded-xl font-black text-white text-xs uppercase tracking-wider hover:brightness-105 transition-all duration-300 shadow-md shadow-orange-600/10 cursor-pointer"
+                className="w-1/2 bg-brand hover:bg-brand-hover py-3 rounded-lg font-black text-ink-inverted text-xs uppercase tracking-wider transition-all duration-200 ease-expo cursor-pointer active:scale-[0.98] shadow-card"
               >
                 Guardar Cuenta
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* =========================================================================
+         MODAL INTERACTIVO: ARQUEO DE CAJA DIARIA EN VIVO (FLOAT TRIGGER)
+         ========================================================================= */}
+      {showArqueoModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-overlay backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="w-[450px] max-h-[85vh] rounded-2xl border border-edge bg-surface p-6 shadow-modal animate-in zoom-in-95 duration-200 flex flex-col">
+            <div className="flex justify-between items-center mb-3">
+              <h2 className="text-base font-black text-ink uppercase tracking-tight flex items-center gap-1.5">
+                <svg className="w-4 h-4 text-brand" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+                </svg>
+                <span>Arqueo Financiero en Vivo</span>
+              </h2>
+              <span className="text-[9px] bg-brand-subtle text-brand-text border border-brand/20 px-2.5 py-0.5 rounded-full font-black uppercase">
+                Tiempo Real
+              </span>
+            </div>
+
+            <p className="text-xs text-ink-secondary mb-4 leading-relaxed font-medium">
+              Movimientos financieros consolidados para la jornada contable activa de hoy.
+            </p>
+
+            <div className="flex-1 overflow-y-auto flex flex-col gap-3.5 mb-5 pr-1 scrollbar-thin">
+              {/* Saldo Efectivo Computado */}
+              <div className="p-4 bg-inset rounded-xl border border-edge flex justify-between items-center">
+                <div>
+                  <span className="text-[10px] font-black text-ink-tertiary uppercase block">Caja Física (Efectivo)</span>
+                  <span className="text-xs text-ink-secondary mt-0.5 block">Saldo en gaveta físico esperado</span>
+                </div>
+                <span className="text-2xl font-black font-mono text-brand">S/ {efectivoCajaFisica.toFixed(2)}</span>
+              </div>
+
+              {/* Desglose de Movimientos */}
+              <div className="flex flex-col gap-2">
+                <span className="text-[10px] font-black text-ink-tertiary uppercase tracking-wider">Historial de Flujos del Día</span>
+                <div className="border border-edge rounded-xl divide-y divide-edge bg-inset max-h-[200px] overflow-y-auto scrollbar-thin">
+                  {mockMovimientos.filter(m => m.caja_id === cajaActivaId).length === 0 ? (
+                    <div className="p-4 text-center text-xs text-ink-tertiary font-bold uppercase">Sin movimientos registrados</div>
+                  ) : (
+                    mockMovimientos
+                      .filter(m => m.caja_id === cajaActivaId)
+                      .map((mov) => (
+                        <div key={mov.id} className="p-2.5 flex justify-between items-center text-xs">
+                          <div className="flex flex-col gap-0.5">
+                            <span className="font-bold text-ink uppercase text-[10px]">{mov.tipo}</span>
+                            <span className="text-ink-tertiary text-[9px] font-mono">{new Date(mov.fecha).toLocaleTimeString()}</span>
+                          </div>
+                          <span className={`font-mono font-bold ${
+                            mov.tipo === 'apertura' || mov.tipo === 'ingreso'
+                              ? 'text-positive'
+                              : 'text-negative'
+                          }`}>
+                            {mov.tipo === 'apertura' || mov.tipo === 'ingreso' ? '+' : '-'}S/ {mov.monto.toFixed(2)}
+                          </span>
+                        </div>
+                      ))
+                  )}
+                </div>
+              </div>
+
+              {/* Billeteras Digitales */}
+              <div className="flex flex-col gap-2">
+                <span className="text-[10px] font-black text-ink-tertiary uppercase tracking-wider">Billeteras Digitales Activas</span>
+                <div className="grid grid-cols-2 gap-2">
+                  {cuentasBilletera.map((cta) => (
+                    <div key={cta.id} className="p-3 bg-inset rounded-xl border border-edge flex flex-col gap-1">
+                      <span className="text-[10px] font-bold text-ink-secondary uppercase truncate">{cta.nombre}</span>
+                      <span className="text-lg font-black font-mono text-brand">S/ {cta.saldo.toFixed(2)}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <button
+              onClick={() => setShowArqueoModal(false)}
+              className="w-full bg-ink hover:bg-ink/90 text-ink-inverted py-3.5 rounded-xl font-black text-xs uppercase tracking-wider transition-all duration-200 ease-expo active:scale-[0.98] shadow-panel"
+            >
+              Cerrar Vista de Arqueo
+            </button>
           </div>
         </div>
       )}

@@ -5,10 +5,10 @@ import dynamic from 'next/dynamic';
 const CashRegister = dynamic(() => import('@/components/pos/CashRegister'), {
   ssr: false,
   loading: () => (
-    <div className="flex h-screen items-center justify-center bg-slate-50 text-slate-800">
+    <div className="flex min-h-[100dvh] items-center justify-center bg-base text-ink">
       <div className="flex flex-col items-center gap-4">
-        <div className="h-10 w-10 animate-spin rounded-full border-4 border-orange-600 border-t-transparent"></div>
-        <p className="font-sans text-sm text-slate-600 font-semibold">Iniciando Terminal BOOM POS...</p>
+        <div className="h-10 w-10 animate-spin rounded-full border-4 border-brand border-t-transparent"></div>
+        <p className="font-sans text-sm text-ink-secondary font-semibold">Iniciando Terminal BOOM POS...</p>
       </div>
     </div>
   ),
@@ -16,7 +16,7 @@ const CashRegister = dynamic(() => import('@/components/pos/CashRegister'), {
 
 export default function Home() {
   return (
-    <main className="min-h-screen bg-slate-50">
+    <main className="min-h-[100dvh] bg-base">
       <CashRegister />
     </main>
   );
