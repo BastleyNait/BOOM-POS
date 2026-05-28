@@ -398,15 +398,35 @@ export function CashRegister() {
   });
 
   return (
-    <div className="flex min-h-[100dvh] flex-col bg-base text-ink p-6 gap-5 font-sans antialiased overflow-hidden transition-all duration-300 ease-expo">
+    <div className="flex min-h-screen flex-col bg-base text-ink p-6 gap-5 font-sans antialiased overflow-hidden theme-transition transition-colors duration-300">
       
       {/* 1. Header Premium */}
       <header className="flex w-full items-center justify-between border-b border-edge pb-4 flex-shrink-0 transition-colors duration-200">
         <div className="flex items-center gap-3">
-          <div>
-            <h1 className="text-2xl font-black text-brand tracking-tight leading-none transition-colors duration-200">
-              BOOM POS
-            </h1>
+          <div className="flex items-center gap-2.5 group select-none">
+            {/* Icono Geométrico Premium */}
+            <div className="relative flex items-center justify-center w-8.5 h-8.5 rounded-xl bg-brand/10 border border-brand/20 transition-all duration-300 group-hover:scale-105 active:scale-95 group-hover:bg-brand/15 group-hover:border-brand/40 shadow-sm overflow-hidden">
+              <div className="absolute inset-0 bg-radial-gradient(from 50% 50%, var(--color-brand) 0%, transparent 100%) opacity-30 blur-sm"></div>
+              <svg className="w-4.5 h-4.5 text-brand relative z-10 transition-transform duration-300 group-hover:rotate-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" fill="currentColor" className="text-brand opacity-20" />
+                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+              </svg>
+            </div>
+            
+            {/* Tipografía con Contraste Avanzado */}
+            <div className="flex flex-col">
+              <div className="flex items-center gap-1">
+                <span className="text-base font-black tracking-tighter text-ink uppercase leading-none transition-colors duration-200 group-hover:text-brand">
+                  BOOM
+                </span>
+                <span className="text-base font-light tracking-widest text-ink-secondary uppercase leading-none font-mono">
+                  POS
+                </span>
+              </div>
+              <span className="text-[8px] font-black text-ink-tertiary tracking-widest uppercase mt-0.5 leading-none opacity-80 block">
+                Terminal de Venta
+              </span>
+            </div>
           </div>
           {getIsMockMode() && (
             <span className="inline-flex items-center gap-1.5 bg-brand-subtle text-brand-text border border-brand/20 text-[9px] font-black tracking-wider uppercase px-3 py-1 rounded-full shadow-card">
@@ -452,10 +472,10 @@ export function CashRegister() {
       </div>
 
       {/* 3. Panel Principal Dividido Unificado (3 columnas adaptables a monitores cuadrados) */}
-      <div className="flex flex-1 gap-4 overflow-hidden justify-center">
+      <div className="flex flex-1 gap-4 overflow-hidden w-full">
         
         {/* COLUMNA 1 (IZQUIERDA - OPERATIVA): Buscador, Calculadora Rápida y Carrito */}
-        <div className="flex-1 max-w-[340px] 2xl:max-w-[440px] min-w-[280px] flex flex-col gap-3 overflow-hidden">
+        <div className="w-[320px] xl:w-[380px] 2xl:w-[440px] flex-shrink-0 flex flex-col gap-3 overflow-hidden">
 
           {/* Calculadora Rápida [F7] (Rediseño Ultra-Compacto para maximizar la Canasta) */}
           <div className="bg-surface rounded-xl border border-edge p-3 shadow-card flex flex-col gap-2 transition-all duration-200 ease-expo">
@@ -590,7 +610,7 @@ export function CashRegister() {
         </div>
 
         {/* COLUMNA 2 (CENTRAL - CATÁLOGO): Grilla de Productos Rápidos por Categoría (Se oculta en pantallas angostas/cuadradas para evitar roturas) */}
-        <div className="flex flex-1 min-w-[240px] max-w-[500px] bg-surface rounded-xl border border-edge p-4 shadow-card overflow-hidden flex-col transition-all duration-200 ease-expo">
+        <div className="flex flex-1 min-w-[320px] bg-surface rounded-xl border border-edge p-4 shadow-card overflow-hidden flex-col transition-all duration-200 ease-expo">
 
           {/* Buscador de código de barras / manual */}
           <div className="relative mb-3">
@@ -706,22 +726,9 @@ export function CashRegister() {
 
         {/* COLUMNA 3 (DERECHA - CAJA & AUDITORÍA): Totales, Liquidación y Cierre de Caja */}
         <div className="relative w-[320px] xl:w-[360px] 2xl:w-[420px] rounded-xl flex flex-col flex-shrink-0 transition-all duration-200 ease-expo">
+
           <div className="bg-surface rounded-xl border border-edge shadow-panel flex flex-col justify-between overflow-y-auto h-full p-4 scrollbar-thin">
-          
-          {/* Botón flotante Arqueo */}
-          <button
-            type="button"
-            onClick={() => setShowArqueoModal(true)}
-            className="absolute -top-3 -right-3 w-10 h-10 bg-brand text-ink-inverted rounded-full flex items-center justify-center shadow-float hover:shadow-modal hover:scale-110 hover:bg-brand-hover transition-all duration-200 ease-spring z-20 group cursor-pointer"
-          >
-            <svg className="w-5 h-5 text-ink-inverted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
-            </svg>
-            <span className="absolute -top-10 right-0 w-max bg-ink text-ink-inverted text-[10px] font-bold px-3 py-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none shadow-panel">
-              Arqueo financiero en tiempo real
-            </span>
-          </button>
-          <div className="flex flex-col">
+            <div className="flex flex-col">
             <h2 className="text-sm font-black text-ink pb-2 border-b border-edge uppercase tracking-wider flex justify-between items-center transition-colors duration-200">
               <span>Liquidación de Caja</span>
               <kbd className="px-1.5 py-0.5 bg-inset border border-edge rounded font-mono text-[8px] text-ink-tertiary shadow-card">F9</kbd>
@@ -891,9 +898,19 @@ export function CashRegister() {
               </div>
             )}
 
-            
+            {/* Botón Arqueo Financiero en Vivo (Reubicado e integrado) */}
+            <button
+              type="button"
+              onClick={() => setShowArqueoModal(true)}
+              className="w-full mt-3.5 py-3 px-4 bg-brand-subtle hover:bg-brand/10 text-brand-text border border-brand/20 hover:border-brand/35 rounded-xl text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2 transition-all duration-200 cursor-pointer active:scale-[0.97]"
+            >
+              <svg className="w-4 h-4 text-brand-text" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+              </svg>
+              <span>Arqueo Financiero en Vivo</span>
+            </button>
+
           </div>
-        </div>
 
         {/* Botón de Confirmación Principal */}
         <div className="flex flex-col gap-1.5 mt-2">
@@ -914,6 +931,7 @@ export function CashRegister() {
         </div>
 
       </div>
+    </div>
 
       {/* =========================================================================
          MODAL INTERACTIVO: APERTURA DE CAJA
