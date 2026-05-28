@@ -13,6 +13,85 @@ import { confirmarVentaAction, abrirCajaAction } from '../../lib/supabase/action
 import { formatTicketForThermalPrinter } from '../../lib/utils/ticketFormatter';
 import { getIsMockMode } from '../../lib/supabase/client';
 
+const getItemIcon = (name: string) => {
+  switch (name) {
+    case 'Pollo Fresco':
+      return (
+        <svg className="w-8 h-8 text-amber-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15 3a6 6 0 016 6c0 2.5-2 4.5-4.5 5.5l-3.5 3.5a2.5 2.5 0 01-3.5-3.5l3.5-3.5C14 11 12 9 12 9a6 6 0 013-6z" />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M8 16a2.5 2.5 0 10-5 0 2.5 2.5 0 005 0z" />
+        </svg>
+      );
+    case 'Carne de Res':
+      return (
+        <svg className="w-8 h-8 text-amber-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2z" />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 12m-2 0a2 2 0 104 0 2 2 0 00-4 0" />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 10V4M10 12H4" />
+        </svg>
+      );
+    case 'Carne de Chancho':
+      return (
+        <svg className="w-8 h-8 text-amber-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="2.5" />
+          <ellipse cx="12" cy="12" rx="4" ry="3" stroke="currentColor" strokeWidth="2.5" />
+          <circle cx="10" cy="12" r="1.2" fill="currentColor" />
+          <circle cx="14" cy="12" r="1.2" fill="currentColor" />
+        </svg>
+      );
+    case 'Milanesa':
+      return (
+        <svg className="w-8 h-8 text-amber-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M4 10c0-4 6-6 10-4s8 4 8 8-4 8-10 6-8-6-8-8z" />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 12h.01M12 10h.01M15 13h.01M11 15h.01" />
+        </svg>
+      );
+    case 'Verduras':
+      return (
+        <svg className="w-8 h-8 text-amber-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 19l2.5-2.5m-1-1l6.5-6.5C14.5 7.5 16 6 17 6c1.5 0 2.5 1 2.5 2.5 0 1-1.5 2.5-3 4l-6.5 6.5-1-1.5" />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M18.5 7.5L21 5m-2.5 2.5L20 9" />
+        </svg>
+      );
+    case 'Frutas':
+      return (
+        <svg className="w-8 h-8 text-amber-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 6.5C10.5 5 8 5 6.5 6.5c-2 2-2 5.5 0 7.5 1 1 2.5 2 5.5 3 3-1 4.5-2 5.5-3 2-2 2-5.5 0-7.5C16 5 13.5 5 12 6.5z" />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 6.5V4c1.5 0 2-1 2-1" />
+        </svg>
+      );
+    case 'Arroz':
+      return (
+        <svg className="w-8 h-8 text-amber-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M2 10a10 10 0 0020 0H2z" />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 20h6" />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M7 6c0-1.5 1-2 1-2M12 6c0-2 1-2 1-2M17 6c0-1.5 1-2 1-2" />
+        </svg>
+      );
+    case 'Azúcar':
+      return (
+        <svg className="w-8 h-8 text-amber-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <rect x="4" y="10" width="7" height="7" rx="1.5" stroke="currentColor" strokeWidth="2.5" />
+          <rect x="13" y="10" width="7" height="7" rx="1.5" stroke="currentColor" strokeWidth="2.5" />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M7 6h.01M17 6h.01M12 8h.01" />
+        </svg>
+      );
+    case 'Harina':
+      return (
+        <svg className="w-8 h-8 text-amber-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 22V2M12 6c-2-1.5-3 .5-3 .5s1 2 3 .5M12 11c-2-1.5-3 .5-3 .5s1 2 3 .5M12 16c-2-1.5-3 .5-3 .5s1 2 3 .5" />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 6c2-1.5 3 .5 3 .5s-1 2-3 .5M12 11c2-1.5 3 .5 3 .5s-1 2-3 .5M12 16c2-1.5 3 .5 3 .5s-1 2-3 .5" />
+        </svg>
+      );
+    default:
+      return (
+        <svg className="w-8 h-8 text-amber-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+        </svg>
+      );
+  }
+};
+
 export function CashRegister() {
   const { addToast } = useToastStore();
   const { requestConfirm } = useConfirmStore();
@@ -350,9 +429,12 @@ export function CashRegister() {
                   setEfectivoDeclaradoInput(efectivoCajaFisica.toFixed(2));
                   setShowCierreModal(true);
                 }}
-                className="inline-flex items-center gap-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 hover:text-rose-800 border border-rose-200/70 hover:border-rose-300 text-[9px] font-black tracking-wider uppercase px-4 py-2.5 rounded-xl transition-all cursor-pointer shadow-sm"
+                className="inline-flex items-center gap-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 hover:text-rose-800 border border-rose-200/70 hover:border-rose-300 text-[9px] font-black tracking-wider uppercase px-4 py-2.5 rounded-xl transition-all cursor-pointer shadow-sm group"
               >
-                <span>🔒 Cerrar Caja [F10]</span>
+                <svg className="w-3 h-3 text-rose-700 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                </svg>
+                <span>Cerrar Caja [F10]</span>
               </button>
             </div>
           ) : (
@@ -378,8 +460,11 @@ export function CashRegister() {
           {/* Calculadora Rápida [F7] (Rediseño Ultra-Compacto para maximizar la Canasta) */}
           <div className="bg-white rounded-3xl border border-slate-200/80 p-3 shadow-sm flex flex-col gap-2">
             <div className="flex items-center justify-between">
-              <h3 className="text-xs font-black text-slate-700 flex items-center gap-1 uppercase tracking-wide">
-                🧮 Calculadora Rápida
+              <h3 className="text-xs font-black text-slate-700 flex items-center gap-1.5 uppercase tracking-wide">
+                <svg className="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                </svg>
+                Calculadora Rápida
               </h3>
               <span className="text-[9px] font-extrabold bg-orange-50 text-orange-700 px-2 py-0.5 rounded border border-orange-200">
                 [F7]
@@ -450,7 +535,10 @@ export function CashRegister() {
           <div className="flex-1 flex flex-col overflow-hidden bg-white rounded-3xl border border-slate-200/80 p-4.5 shadow-sm">
             <div className="flex items-center justify-between mb-2">
               <h2 className="text-xs font-black text-slate-700 flex items-center gap-2 uppercase tracking-wide">
-                🛍️ Canasta de Compras
+                <svg className="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                </svg>
+                Canasta de Compras
               </h2>
               <span className="text-[10px] bg-slate-100 px-2 py-0.5 rounded-full font-mono font-black text-slate-600 border border-slate-200/50">
                 {items.length} {items.length === 1 ? 'item' : 'items'}
@@ -489,10 +577,13 @@ export function CashRegister() {
                     clearActiveTab();
                   }
                 }}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white hover:bg-rose-50 text-slate-500 hover:text-rose-700 text-[10px] font-extrabold uppercase rounded-lg border border-slate-200 hover:border-rose-200 transition-all cursor-pointer shadow-sm"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white hover:bg-rose-50 text-slate-500 hover:text-rose-700 text-[10px] font-extrabold uppercase rounded-lg border border-slate-200 hover:border-rose-200 transition-all cursor-pointer shadow-sm group"
               >
-                <span>🗑️ Limpiar Todo</span>
-                <kbd className="px-1 py-0.2 bg-slate-50 border border-slate-200 rounded font-mono text-[8px] text-slate-400">ESC</kbd>
+                <svg className="w-3.5 h-3.5 text-slate-400 group-hover:text-rose-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+                Limpiar Todo
+                <kbd className="px-1 py-0.2 bg-slate-50 border border-slate-200 rounded font-mono text-[8px] text-slate-400 ml-1">ESC</kbd>
               </button>
             </div>
           </div>
@@ -531,23 +622,23 @@ export function CashRegister() {
           <div className="flex-1 overflow-y-auto grid grid-cols-2 2xl:grid-cols-3 gap-3 pr-1 align-content-start">
             {categoriaActiva === 'Emporio' ? (
               [
-                { name: 'Pollo Fresco', emoji: '🍗' },
-                { name: 'Carne de Res', emoji: '🍖' },
-                { name: 'Carne de Chancho', emoji: '🥓' },
-                { name: 'Milanesa', emoji: '🥩' },
-                { name: 'Verduras', emoji: '🥬' },
-                { name: 'Frutas', emoji: '🍎' },
-                { name: 'Arroz', emoji: '🍚' },
-                { name: 'Azúcar', emoji: '🧊' },
-                { name: 'Harina', emoji: '🌾' },
-                { name: 'Varios / Otros', emoji: '➕' }
+                { name: 'Pollo Fresco' },
+                { name: 'Carne de Res' },
+                { name: 'Carne de Chancho' },
+                { name: 'Milanesa' },
+                { name: 'Verduras' },
+                { name: 'Frutas' },
+                { name: 'Arroz' },
+                { name: 'Azúcar' },
+                { name: 'Harina' },
+                { name: 'Varios / Otros' }
               ].map((item) => (
                 <button
                   key={item.name}
                   onClick={() => handleQuickSuggestion(item.name)}
                   className="p-4 rounded-2xl border text-center flex flex-col items-center justify-center h-28 transition-all relative cursor-pointer bg-amber-50/50 border-amber-200/80 hover:bg-amber-100 hover:border-amber-500 hover:shadow-md active:scale-95"
                 >
-                  <span className="text-3xl mb-2">{item.emoji}</span>
+                  {getItemIcon(item.name)}
                   <span className="text-xs font-black text-slate-800 leading-snug">{item.name}</span>
                 </button>
               ))
@@ -624,7 +715,9 @@ export function CashRegister() {
             onClick={() => setShowArqueoModal(true)}
             className="absolute -top-3 -right-3 w-10 h-10 bg-orange-500 text-white rounded-full flex items-center justify-center shadow-lg hover:shadow-xl hover:scale-110 hover:bg-orange-600 transition-all z-20 group cursor-pointer"
           >
-            📊
+            <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+            </svg>
             <span className="absolute -top-10 right-0 w-max bg-slate-800 text-white text-[10px] font-bold px-3 py-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-md">
               Arqueo financiero en tiempo real
             </span>
@@ -670,13 +763,16 @@ export function CashRegister() {
                     setMontoPago('');
                     setCambio(0);
                   }}
-                  className={`py-2 text-xs font-bold rounded-lg cursor-pointer transition-all ${
+                  className={`py-2 text-xs font-bold rounded-lg cursor-pointer transition-all flex items-center justify-center gap-1.5 ${
                     metodoPago === 'efectivo'
                       ? 'bg-white text-slate-800 shadow-sm border border-slate-200/40'
                       : 'text-slate-500 hover:text-slate-700'
                   }`}
                 >
-                  💵 Efectivo
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+                  </svg>
+                  Efectivo
                 </button>
                 <button
                   type="button"
@@ -685,13 +781,16 @@ export function CashRegister() {
                     setMontoPago(total.toFixed(2));
                     setCambio(0);
                   }}
-                  className={`py-2 text-xs font-bold rounded-lg cursor-pointer transition-all ${
+                  className={`py-2 text-xs font-bold rounded-lg cursor-pointer transition-all flex items-center justify-center gap-1.5 ${
                     metodoPago === 'billetera_digital'
                       ? 'bg-white text-slate-800 shadow-sm border border-slate-200/40'
                       : 'text-slate-500 hover:text-slate-700'
                   }`}
                 >
-                  📱 Billetera
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                  </svg>
+                  Billetera
                 </button>
               </div>
             </div>
@@ -852,7 +951,7 @@ export function CashRegister() {
       )}
 
       {/* =========================================================================
-         🔒 MODAL INTERACTIVO: CIERRE DE CAJA DIARIA (ARQUEO FISICO)
+         MODAL INTERACTIVO: CIERRE DE CAJA DIARIA (ARQUEO FISICO)
          ========================================================================= */}
       {showCierreModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm">
@@ -901,10 +1000,10 @@ export function CashRegister() {
                     }`}>
                       <span className="text-xs font-black uppercase">
                         {Math.abs(dif) < 0.01 
-                          ? '✓ Caja Perfectamente Cuadrada' 
+                          ? 'Caja Perfectamente Cuadrada' 
                           : dif > 0 
-                            ? '🟢 Sobrante de Caja' 
-                            : '🔴 Discrepancia / Faltante'}
+                            ? 'Sobrante de Caja' 
+                            : 'Discrepancia / Faltante'}
                       </span>
                       <span className="text-base font-black font-mono">
                         {dif >= 0 ? '+' : ''}S/ {dif.toFixed(2)}
@@ -927,9 +1026,12 @@ export function CashRegister() {
               <button
                 type="button"
                 onClick={handleConfirmarCierre}
-                className="w-1/2 bg-slate-900 hover:bg-slate-800 py-3.5 rounded-2xl font-black text-white text-xs uppercase tracking-wider transition-all cursor-pointer shadow-md"
+                className="w-1/2 bg-slate-900 hover:bg-slate-800 py-3.5 rounded-2xl font-black text-white text-xs uppercase tracking-wider transition-all cursor-pointer shadow-md flex items-center justify-center gap-1.5"
               >
-                🔒 Confirmar y Cerrar Caja
+                <svg className="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                </svg>
+                Confirmar y Cerrar Caja
               </button>
             </div>
           </div>
@@ -937,14 +1039,17 @@ export function CashRegister() {
       )}
 
       {/* =========================================================================
-         📋 MODAL INTERACTIVO: REPORTE DE AUDITORÍA DE CIERRE DE CAJA
+         MODAL INTERACTIVO: REPORTE DE AUDITORÍA DE CIERRE DE CAJA
          ========================================================================= */}
       {showCierreReport && cierreReportData && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm">
           <div className="w-[450px] rounded-3xl border border-slate-200 bg-white p-6 shadow-2xl animate-in zoom-in-95 duration-200 flex flex-col max-h-[85vh]">
             <div className="flex justify-between items-center mb-3">
               <h2 className="text-base font-black text-slate-800 uppercase tracking-tight flex items-center gap-1.5">
-                <span>📄 Reporte Auditoría de Cierre</span>
+                <svg className="w-4 h-4 text-slate-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                <span>Reporte Auditoría de Cierre</span>
               </h2>
               <span className="text-[9px] bg-slate-900 text-orange-400 border border-slate-800 px-2.5 py-0.5 rounded-full font-black uppercase">
                 EMITIDO
@@ -1035,7 +1140,12 @@ export function CashRegister() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm">
           <div className="w-[380px] max-h-[85vh] rounded-3xl border border-slate-200 bg-white p-5 shadow-2xl animate-in zoom-in-95 duration-200 flex flex-col">
             <div className="flex justify-between items-center mb-3">
-              <h2 className="text-base font-extrabold text-slate-800">Venta Exitosa ✓</h2>
+              <h2 className="text-base font-extrabold text-slate-800 flex items-center gap-1.5">
+                <svg className="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                Venta Exitosa
+              </h2>
               <span className="text-[9px] bg-orange-50 text-orange-700 border border-orange-200 px-2.5 py-0.5 rounded-full font-black uppercase">
                 IMPRESO 58MM
               </span>

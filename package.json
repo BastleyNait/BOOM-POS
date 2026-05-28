@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "find-transcript": "node src/find_transcript.js"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.106.0",

@@ -60,6 +60,18 @@ export interface MockPedido {
     cantidad_sugerida: number;
     precio_costo: number;
   }[];
+  repartidor?: string;
+  fecha_solicitud?: string;
+  fecha_pago_descarga?: string;
+}
+
+export interface FaltanteFresco {
+  id: string;
+  nombre: string;
+  cantidad: string;
+  notas?: string;
+  comprado: boolean;
+  fecha: string;
 }
 
 export interface MockMovimiento {
@@ -125,6 +137,7 @@ interface CartStore {
   mockProveedores: MockProveedor[];
   cuentasBilletera: CuentaBilletera[];
   historialCierres: CierreDiario[];
+  faltantesFrescos: FaltanteFresco[];
 
   addMockProduct: (prod: Omit<MockProduct, 'id'> & { id?: string }) => { success: boolean; error?: string };
   updateMockProduct: (prod: MockProduct) => { success: boolean; error?: string };
@@ -143,6 +156,13 @@ interface CartStore {
   // Acciones de Apertura/Cierre Diario
   abrirCajaDiaria: (montoApertura: number) => { success: boolean; data?: { cajaId: string } };
   cerrarCajaDiaria: (efectivoDeclarado: number) => { success: boolean; data?: CierreDiario; error?: string };
+
+  // Acciones de Faltantes de Frescos & Compras Manuales
+  agregarFaltanteFresco: (item: Omit<FaltanteFresco, 'id' | 'comprado' | 'fecha'>) => void;
+  toggleFaltanteFresco: (id: string) => void;
+  eliminarFaltanteFresco: (id: string) => void;
+  limpiarFaltantesFrescos: () => void;
+  agregarMockPedido: (pedido: Omit<MockPedido, 'id' | 'estado' | 'estado_pago'>) => void;
 }
 
 const INITIAL_TABS: TabState[] = [
@@ -190,6 +210,7 @@ export const useCartStore = create<CartStore>()(
       mockProveedores: INITIAL_MOCK_PROVIDERS,
       cuentasBilletera: INITIAL_CUENTAS_BILLETERA,
       historialCierres: [],
+      faltantesFrescos: [],
 
       setModo: (modo) => set({ modo }),
       
@@ -706,6 +727,44 @@ export const useCartStore = create<CartStore>()(
 
         return { success: true, data: nuevoCierre };
       },
+
+      agregarFaltanteFresco: (item) => set((state) => {
+        const id = 'fresco-' + Math.random().toString(36).substring(2, 9);
+        const nuevo: FaltanteFresco = {
+          ...item,
+          id,
+          comprado: false,
+          fecha: new Date().toLocaleDateString()
+        };
+        return {
+          faltantesFrescos: [...state.faltantesFrescos, nuevo]
+        };
+      }),
+
+      toggleFaltanteFresco: (id) => set((state) => ({
+        faltantesFrescos: state.faltantesFrescos.map(f => f.id === id ? { ...f, comprado: !f.comprado } : f)
+      })),
+
+      eliminarFaltanteFresco: (id) => set((state) => ({
+        faltantesFrescos: state.faltantesFrescos.filter(f => f.id !== id)
+      })),
+
+      limpiarFaltantesFrescos: () => set({
+        faltantesFrescos: []
+      }),
+
+      agregarMockPedido: (pedido) => set((state) => {
+        const id = 'ped-manual-' + Math.random().toString(36).substring(2, 9);
+        const nuevo: MockPedido = {
+          ...pedido,
+          id,
+          estado: 'pendiente',
+          estado_pago: 'pendiente_de_pago'
+        };
+        return {
+          mockPedidos: [...state.mockPedidos, nuevo]
+        };
+      }),
     }),
     {
       name: 'boom-pos-cart-storage',

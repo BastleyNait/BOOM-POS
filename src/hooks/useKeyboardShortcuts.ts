@@ -25,7 +25,9 @@ export function useKeyboardShortcuts({
     setSelectedCartItemIndex,
     updateQuantity,
     removeFromCart,
-    clearActiveTab
+    clearActiveTab,
+    undoClearActiveTab,
+    redoClearActiveTab
   } = useCartStore();
 
   const currentTab = tabs[activeTabIndex];

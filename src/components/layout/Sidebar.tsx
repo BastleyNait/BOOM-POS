@@ -7,9 +7,10 @@ import { useCartStore } from '../../store/useCartStore';
 
 export function Sidebar() {
   const pathname = usePathname();
-  const { cajaActivaId, mockMovimientos, clearActiveTab } = useCartStore();
+  const { cajaActivaId, mockMovimientos, clearActiveTab, mockPedidos, faltantesFrescos } = useCartStore();
   const [showAuditoriaModal, setShowAuditoriaModal] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(true);
+  const [activeTab, setActiveTab] = useState('productos');
 
   // Auto-detectar pantalla chica al montar y redimensionar
   useEffect(() => {
@@ -25,6 +26,26 @@ export function Sidebar() {
     }
   }, []);
 
+  // Escuchar cambios en la URL (search params) de manera compatible con SSR y compilación Next.js
+  useEffect(() => {
+    const handleUrlChange = () => {
+      if (typeof window !== 'undefined') {
+        const params = new URLSearchParams(window.location.search);
+        const tab = params.get('tab') || 'productos';
+        setActiveTab(tab);
+      }
+    };
+
+    handleUrlChange();
+    window.addEventListener('popstate', handleUrlChange);
+    const interval = setInterval(handleUrlChange, 100);
+
+    return () => {
+      window.removeEventListener('popstate', handleUrlChange);
+      clearInterval(interval);
+    };
+  }, []);
+
   // Filtrar movimientos de la caja activa
   const cajaMovimientos = mockMovimientos.filter(m => m.caja_id === cajaActivaId);
 
@@ -37,6 +58,14 @@ export function Sidebar() {
     }
     return acc;
   }, 0);
+
+  // Calcular deudas pendientes con proveedores
+  const deudasPendientes = mockPedidos
+    .filter(p => p.estado === 'completado' && p.estado_pago === 'pendiente_de_pago')
+    .reduce((sum, p) => sum + p.monto_total, 0);
+
+  // Calcular faltantes de frescos activos
+  const activeFaltantesCount = (faltantesFrescos || []).filter(f => !f.comprado).length;
 
   return (
     <>
@@ -106,22 +135,106 @@ export function Sidebar() {
               {!isCollapsed && <span>Punto de Venta</span>}
             </Link>
 
+            {/* Subenlaces de Inventario ERP */}
             <Link
-              href="/inventario"
+              href="/inventario?tab=productos"
               className={`
                 flex items-center rounded-2xl text-sm font-bold transition-all duration-300 
                 ${isCollapsed ? 'justify-center p-3' : 'gap-3 px-4 py-3 border-l-4'} 
-                ${pathname === '/inventario'
+                ${pathname === '/inventario' && activeTab === 'productos'
                   ? 'bg-orange-50/80 text-orange-800 border-orange-600 shadow-[0_4px_12px_-5px_rgba(16,185,129,0.12)]'
                   : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'
                 }
               `}
               title="Inventario & Stock"
             >
-              <svg className={`h-5 w-5 flex-shrink-0 ${pathname === '/inventario' ? 'text-orange-600' : 'text-slate-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className={`h-5 w-5 flex-shrink-0 ${pathname === '/inventario' && activeTab === 'productos' ? 'text-orange-600' : 'text-slate-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
               </svg>
               {!isCollapsed && <span>Inventario & Stock</span>}
+            </Link>
+
+            <Link
+              href="/inventario?tab=compras"
+              className={`
+                flex items-center rounded-2xl text-sm font-bold transition-all duration-300 relative
+                ${isCollapsed ? 'justify-center p-3' : 'gap-3 px-4 py-3 border-l-4'} 
+                ${pathname === '/inventario' && activeTab === 'compras'
+                  ? 'bg-orange-50/80 text-orange-800 border-orange-600 shadow-[0_4px_12px_-5px_rgba(16,185,129,0.12)]'
+                  : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'
+                }
+              `}
+              title="Compras y Deudas"
+            >
+              <svg className={`h-5 w-5 flex-shrink-0 ${pathname === '/inventario' && activeTab === 'compras' ? 'text-orange-600' : 'text-slate-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l2.414 2.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1" />
+              </svg>
+              {!isCollapsed && <span>Compras y Deudas</span>}
+              {deudasPendientes > 0 && (
+                <span className={`absolute flex h-4 w-4 items-center justify-center rounded-full bg-rose-500 text-[8px] font-black text-white animate-bounce ${isCollapsed ? 'top-1.5 right-1.5' : 'top-3 right-4'}`}>
+                  !
+                </span>
+              )}
+            </Link>
+
+            <Link
+              href="/inventario?tab=proveedores"
+              className={`
+                flex items-center rounded-2xl text-sm font-bold transition-all duration-300 
+                ${isCollapsed ? 'justify-center p-3' : 'gap-3 px-4 py-3 border-l-4'} 
+                ${pathname === '/inventario' && activeTab === 'proveedores'
+                  ? 'bg-orange-50/80 text-orange-800 border-orange-600 shadow-[0_4px_12px_-5px_rgba(16,185,129,0.12)]'
+                  : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'
+                }
+              `}
+              title="Catálogo de Proveedores"
+            >
+              <svg className={`h-5 w-5 flex-shrink-0 ${pathname === '/inventario' && activeTab === 'proveedores' ? 'text-orange-600' : 'text-slate-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+              </svg>
+              {!isCollapsed && <span>Proveedores</span>}
+            </Link>
+
+            <Link
+              href="/inventario?tab=mercado"
+              className={`
+                flex items-center rounded-2xl text-sm font-bold transition-all duration-300 relative
+                ${isCollapsed ? 'justify-center p-3' : 'gap-3 px-4 py-3 border-l-4'} 
+                ${pathname === '/inventario' && activeTab === 'mercado'
+                  ? 'bg-orange-50/80 text-orange-800 border-orange-600 shadow-[0_4px_12px_-5px_rgba(16,185,129,0.12)]'
+                  : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'
+                }
+              `}
+              title="Faltantes de Frescos"
+            >
+              <svg className={`h-5 w-5 flex-shrink-0 ${pathname === '/inventario' && activeTab === 'mercado' ? 'text-orange-600' : 'text-slate-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+              </svg>
+              {!isCollapsed && <span>Faltantes de Frescos</span>}
+              {activeFaltantesCount > 0 && (
+                <span className={`absolute flex h-4 w-4 items-center justify-center rounded-full bg-orange-600 text-[8px] font-black text-white ${isCollapsed ? 'top-1.5 right-1.5' : 'top-3 right-4'}`}>
+                  {activeFaltantesCount}
+                </span>
+              )}
+            </Link>
+
+            <Link
+              href="/inventario?tab=cierres"
+              className={`
+                flex items-center rounded-2xl text-sm font-bold transition-all duration-300 
+                ${isCollapsed ? 'justify-center p-3' : 'gap-3 px-4 py-3 border-l-4'} 
+                ${pathname === '/inventario' && activeTab === 'cierres'
+                  ? 'bg-orange-50/80 text-orange-800 border-orange-600 shadow-[0_4px_12px_-5px_rgba(16,185,129,0.12)]'
+                  : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'
+                }
+              `}
+              title="Reportes de Cierre"
+            >
+              <svg className={`h-5 w-5 flex-shrink-0 ${pathname === '/inventario' && activeTab === 'cierres' ? 'text-orange-600' : 'text-slate-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+              {!isCollapsed && <span>Reportes de Cierre</span>}
             </Link>
 
             {/* Auditoría Rápida */}

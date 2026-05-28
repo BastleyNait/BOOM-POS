@@ -377,7 +377,7 @@ export async function verificarDuplicadoProductoAction(
       .eq('codigo', codigo.trim());
 
     if (excluirId) {
-      queryCodigo = queryCodigo.ne('id', excluirId);
+      queryCodigo = queryCodigo.neq('id', excluirId);
     }
 
     const { data: porCodigo } = await queryCodigo.maybeSingle();
@@ -396,7 +396,7 @@ export async function verificarDuplicadoProductoAction(
       .eq('nombre', nombre.trim());
 
     if (excluirId) {
-      queryNombre = queryNombre.ne('id', excluirId);
+      queryNombre = queryNombre.neq('id', excluirId);
     }
 
     const { data: porNombre } = await queryNombre.maybeSingle();
