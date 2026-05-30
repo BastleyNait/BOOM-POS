@@ -69,11 +69,69 @@ export function Sidebar() {
   // Calcular faltantes de frescos activos
   const activeFaltantesCount = (faltantesFrescos || []).filter(f => !f.comprado).length;
 
+  const isMercadoTab = pathname === '/inventario' && activeTab === 'mercado';
+
   return (
     <>
+      {/* Mobile bottom navbar — only shown on mercado tab */}
+      {isMercadoTab && (
+        <nav className="sm:hidden fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-slate-200 flex items-center justify-around px-2 py-1 shadow-[0_-2px_12px_rgba(0,0,0,0.06)] safe-area-pb">
+          <Link
+            href="/"
+            className="flex flex-col items-center gap-0.5 px-3 py-2 rounded-xl text-slate-400 hover:text-slate-700 transition-colors"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+            </svg>
+            <span className="text-[9px] font-black uppercase tracking-wide">Caja</span>
+          </Link>
+
+          <Link
+            href="/inventario?tab=productos"
+            className="flex flex-col items-center gap-0.5 px-3 py-2 rounded-xl text-slate-400 hover:text-slate-700 transition-colors"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+            </svg>
+            <span className="text-[9px] font-black uppercase tracking-wide">Stock</span>
+          </Link>
+
+          <Link
+            href="/inventario?tab=mercado"
+            className="flex flex-col items-center gap-0.5 px-3 py-2 rounded-xl relative"
+          >
+            <div className="w-10 h-10 rounded-2xl bg-orange-500 flex items-center justify-center shadow-lg shadow-orange-500/30 -mt-5">
+              <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+              </svg>
+            </div>
+            <span className="text-[9px] font-black uppercase tracking-wide text-orange-600">Mercado</span>
+            {activeFaltantesCount > 0 && (
+              <span className="absolute top-0 right-2 flex h-4 w-4 items-center justify-center rounded-full bg-orange-500 text-[8px] font-black text-white">
+                {activeFaltantesCount}
+              </span>
+            )}
+          </Link>
+
+          <Link
+            href="/inventario?tab=compras"
+            className="flex flex-col items-center gap-0.5 px-3 py-2 rounded-xl text-slate-400 hover:text-slate-700 transition-colors relative"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l2.414 2.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1" />
+            </svg>
+            <span className="text-[9px] font-black uppercase tracking-wide">Compras</span>
+            {deudasPendientes > 0 && (
+              <span className="absolute top-1 right-2 flex h-3 w-3 rounded-full bg-red-500" />
+            )}
+          </Link>
+        </nav>
+      )}
+
       <aside 
         className={`
-          h-screen sticky top-0 flex flex-col justify-between border-r border-edge bg-surface flex-shrink-0 z-30 
+          hidden sm:flex h-screen sticky top-0 flex-col justify-between border-r border-edge bg-surface flex-shrink-0 z-30 
           shadow-card transition-all duration-300 ease-expo
           ${isCollapsed ? 'w-20' : 'w-56 2xl:w-64'}
         `}

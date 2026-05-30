@@ -209,4 +209,11 @@ input[type="number"] {
 /* Smooth transition for theme switch */
 html {
   transition: background-color 0.3s var(--ease-out-expo), color 0.3s var(--ease-out-expo);
+  height: 100%;
+  /* Evita zoom automático en iOS al enfocar inputs */
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  height: 100%;
 }

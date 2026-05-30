@@ -398,7 +398,7 @@ export function CashRegister() {
   });
 
   return (
-    <div className="flex min-h-screen flex-col bg-base text-ink p-6 gap-5 font-sans antialiased overflow-hidden theme-transition transition-colors duration-300">
+    <div className="flex h-screen flex-col bg-base text-ink p-6 gap-5 font-sans antialiased overflow-hidden theme-transition transition-colors duration-300">
       
       {/* 1. Header Premium */}
       <header className="flex w-full items-center justify-between border-b border-edge pb-4 flex-shrink-0 transition-colors duration-200">
@@ -731,7 +731,19 @@ export function CashRegister() {
             <div className="flex flex-col">
             <h2 className="text-sm font-black text-ink pb-2 border-b border-edge uppercase tracking-wider flex justify-between items-center transition-colors duration-200">
               <span>Liquidación de Caja</span>
-              <kbd className="px-1.5 py-0.5 bg-inset border border-edge rounded font-mono text-[8px] text-ink-tertiary shadow-card">F9</kbd>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setShowArqueoModal(true)}
+                  title="Arqueo en vivo"
+                  className="p-1.5 bg-surface hover:bg-inset border border-edge rounded-md text-ink-secondary hover:text-ink transition-all cursor-pointer shadow-sm active:scale-95 flex items-center justify-center"
+                >
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+                  </svg>
+                </button>
+                <kbd className="px-1.5 py-0.5 bg-inset border border-edge rounded font-mono text-[8px] text-ink-tertiary shadow-card">F9</kbd>
+              </div>
             </h2>
 
             {/* Fila de Totales */}
@@ -898,17 +910,7 @@ export function CashRegister() {
               </div>
             )}
 
-            {/* Botón Arqueo Financiero en Vivo (Reubicado e integrado) */}
-            <button
-              type="button"
-              onClick={() => setShowArqueoModal(true)}
-              className="w-full mt-3.5 py-3 px-4 bg-brand-subtle hover:bg-brand/10 text-brand-text border border-brand/20 hover:border-brand/35 rounded-xl text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2 transition-all duration-200 cursor-pointer active:scale-[0.97]"
-            >
-              <svg className="w-4 h-4 text-brand-text" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
-              </svg>
-              <span>Arqueo Financiero en Vivo</span>
-            </button>
+
 
           </div>
 

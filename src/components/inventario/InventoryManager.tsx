@@ -100,6 +100,8 @@ export function InventoryManager() {
   const [frescoNotas, setFrescoNotas] = useState('');
   const [timeRemaining, setTimeRemaining] = useState('');
   const [sugerenciasFiltradas, setSugerenciasFiltradas] = useState<string[]>([]);
+  const [showCustomFrescoInput, setShowCustomFrescoInput] = useState(false);
+  const [mobileMercadoView, setMobileMercadoView] = useState<'agregar' | 'lista'>('agregar');
 
   // ----------------------------------------------------
   // ESTADOS CREACIÓN PEDIDO MANUAL
@@ -189,9 +191,9 @@ export function InventoryManager() {
   };
 
   const handleQuickFrescoTap = (item: string) => {
-    const existe = (faltantesFrescos || []).some(f => f.nombre.toLowerCase() === item.toLowerCase() && !f.comprado);
-    if (existe) {
-      addToast(`'${item}' ya se encuentra como faltante activo en la lista.`, 'info');
+    const faltante = (faltantesFrescos || []).find(f => f.nombre.toLowerCase() === item.toLowerCase() && !f.comprado);
+    if (faltante) {
+      eliminarFaltanteFresco(faltante.id);
       return;
     }
     
@@ -200,8 +202,6 @@ export function InventoryManager() {
       cantidad: 'No especificada',
       notas: 'Agregado por Acceso Rápido'
     });
-    
-    addToast(`'${item}' agregado al instante.`, 'success');
   };
 
   // ----------------------------------------------------
@@ -553,13 +553,17 @@ export function InventoryManager() {
     .reduce((sum, p) => sum + p.monto_total, 0);
 
   return (
-    <div className="flex h-screen bg-slate-50 text-slate-800 p-6 gap-3 font-sans antialiased overflow-hidden">
+    <div className={`flex bg-slate-50 text-slate-800 font-sans antialiased overflow-hidden ${
+      activeTab === 'mercado'
+        ? 'h-full sm:h-full sm:p-6 sm:gap-3'
+        : 'h-full p-6 gap-3'
+    }`}>
       
       {/* Columna Izquierda: Panel de Trabajo e Indicadores Financieros */}
       <div className="flex flex-1 flex-col gap-2 overflow-hidden">
         
         {/* Encabezado Principal */}
-        <header className="flex w-full items-center justify-between border-b border-slate-200/80 pb-4 flex-shrink-0">
+        <header className={`flex w-full items-center justify-between border-b border-slate-200/80 pb-4 flex-shrink-0 ${activeTab === 'mercado' ? 'hidden sm:flex' : 'flex'}`}>
           <div>
             <h1 className="text-2xl font-black bg-gradient-to-r from-orange-600 to-amber-600 bg-clip-text text-transparent tracking-tight leading-none">
               Panel ERP & Inventario
@@ -1001,13 +1005,50 @@ export function InventoryManager() {
             CONTENIDO PESTAÑA: FALTANTES DE FRESCOS Y MERCADO
             ------------------------------------------------------------------------- */}
         {activeTab === 'mercado' && (
-          <div className="flex-1 flex flex-col lg:flex-row gap-6 w-full h-full overflow-y-auto lg:overflow-hidden animate-in fade-in duration-300 p-1 lg:p-0">
+          <div className="flex-1 flex flex-col lg:flex-row gap-0 lg:gap-6 w-full h-full overflow-hidden animate-in fade-in duration-300 p-0 sm:p-1 sm:pt-0">
             
-            {/* PANEL DE REGISTRO & ACCESOS RÁPIDOS (Izquierda en desktop, Superior en móvil) */}
-            <div className="w-full lg:w-[420px] xl:w-[480px] flex-shrink-0 flex flex-col gap-5">
+            {/* MOBILE HEADER — only visible on small screens */}
+            <div className="sm:hidden flex items-center justify-between px-4 pt-4 pb-2 flex-shrink-0">
+              <div>
+                <h1 className="text-lg font-black text-slate-800 tracking-tight leading-none">Lista del Mercado</h1>
+                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-0.5">
+                  {new Date().toLocaleDateString('es-PE', { weekday: 'long', day: 'numeric', month: 'short' })}
+                </p>
+              </div>
+              {/* Toggle button mobile */}
+              <button
+                onClick={() => setMobileMercadoView(mobileMercadoView === 'agregar' ? 'lista' : 'agregar')}
+                className={`flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-black uppercase tracking-wide transition-all active:scale-95 cursor-pointer ${
+                  mobileMercadoView === 'lista'
+                    ? 'bg-orange-500 text-white shadow-lg shadow-orange-500/20'
+                    : 'bg-slate-900 text-white shadow-lg shadow-slate-900/20'
+                }`}
+              >
+                {mobileMercadoView === 'lista' ? (
+                  <>
+                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                    Agregar
+                  </>
+                ) : (
+                  <>
+                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                    </svg>
+                    Lista ({faltantesFrescos.filter(f => !f.comprado).length})
+                  </>
+                )}
+              </button>
+            </div>
+
+            {/* PANEL DE REGISTRO (hidden on mobile when lista view active) */}
+            <div className={`flex-1 flex flex-col gap-4 overflow-y-auto pb-24 sm:pb-4 px-4 sm:px-1 ${
+              mobileMercadoView === 'lista' ? 'hidden sm:flex' : 'flex'
+            }`}>
               
               {/* Card 1: Accesos Rápidos (Tap Inteligente - Instantáneo) */}
-              <div className="bg-white rounded-3xl border border-slate-200/80 p-5 shadow-sm flex flex-col gap-4">
+              <div className="bg-white rounded-2xl sm:rounded-3xl border border-slate-200/80 p-4 sm:p-5 shadow-sm flex flex-col gap-3 sm:gap-4">
                 <div className="pb-3 border-b border-slate-100 flex justify-between items-center">
                   <div>
                     <h2 className="text-sm font-black text-slate-800 uppercase tracking-tight flex items-center gap-1.5">
@@ -1020,24 +1061,30 @@ export function InventoryManager() {
                   </div>
                 </div>
 
-                <div className="flex flex-col gap-4 max-h-[300px] overflow-y-auto pr-1">
+                <div className="flex flex-col gap-4 overflow-y-auto pr-1 pb-2 scrollbar-thin overscroll-contain">
                   
                   {/* Verduras */}
                   <div className="flex flex-col gap-1.5">
                     <span className="text-[9px] font-black text-slate-400 uppercase tracking-wider flex items-center gap-1">
                       <span>🥬</span> Verduras y Hortalizas:
                     </span>
-                    <div className="flex flex-wrap gap-1.5">
-                      {['Choclo', 'Limón', 'Cebolla Grande', 'Cebolla Pequeña', 'Rocoto', 'Ají Amarillo', 'Lechuga', 'Alverja', 'Beterraga', 'Kion', 'Pimiento Chico', 'Pimiento Grande', 'Zanahoria', 'Zukini', 'Brócoli', 'Habas'].map((item) => (
+                    <div className="grid grid-cols-4 gap-1.5">
+                      {['Choclo', 'Limón', 'Cebolla Grande', 'Cebolla Pequeña', 'Rocoto', 'Ají Amarillo', 'Lechuga', 'Alverja', 'Beterraga', 'Kion', 'Pimiento Chico', 'Pimiento Grande', 'Zanahoria', 'Zukini', 'Brócoli', 'Habas'].map((item) => {
+                        const isSelected = (faltantesFrescos || []).some(f => f.nombre.toLowerCase() === item.toLowerCase() && !f.comprado);
+                        return (
                         <button
                           key={item}
                           type="button"
                           onClick={() => handleQuickFrescoTap(item)}
-                          className="px-3.5 py-2.5 rounded-2xl text-xs font-bold bg-slate-50 hover:bg-orange-50 border border-slate-200 hover:border-orange-300 text-slate-700 hover:text-orange-700 transition-all cursor-pointer min-h-[44px] active:scale-95 flex items-center select-none shadow-sm"
+                          className={`py-2.5 px-1 rounded-xl text-xs sm:text-[13px] font-bold transition-all cursor-pointer min-h-[48px] active:scale-95 flex items-center justify-center select-none shadow-sm w-full text-center leading-tight ${
+                            isSelected 
+                              ? 'bg-orange-500 text-white border-orange-600 shadow-orange-500/25 shadow-md' 
+                              : 'bg-slate-50 hover:bg-orange-50 border border-slate-200 hover:border-orange-300 text-slate-700 hover:text-orange-700'
+                          }`}
                         >
                           {item}
                         </button>
-                      ))}
+                      )})}
                     </div>
                   </div>
 
@@ -1046,17 +1093,23 @@ export function InventoryManager() {
                     <span className="text-[9px] font-black text-slate-400 uppercase tracking-wider flex items-center gap-1">
                       <span>🍓</span> Frutas Frescas:
                     </span>
-                    <div className="flex flex-wrap gap-1.5">
-                      {['Maracuyá', 'Palta', 'Piña', 'Manzana', 'Papaya'].map((item) => (
+                    <div className="grid grid-cols-4 gap-1.5">
+                      {['Maracuyá', 'Palta', 'Piña', 'Manzana', 'Papaya'].map((item) => {
+                        const isSelected = (faltantesFrescos || []).some(f => f.nombre.toLowerCase() === item.toLowerCase() && !f.comprado);
+                        return (
                         <button
                           key={item}
                           type="button"
                           onClick={() => handleQuickFrescoTap(item)}
-                          className="px-3.5 py-2.5 rounded-2xl text-xs font-bold bg-slate-50 hover:bg-orange-50 border border-slate-200 hover:border-orange-300 text-slate-700 hover:text-orange-700 transition-all cursor-pointer min-h-[44px] active:scale-95 flex items-center select-none shadow-sm"
+                          className={`py-2.5 px-1 rounded-xl text-xs sm:text-[13px] font-bold transition-all cursor-pointer min-h-[48px] active:scale-95 flex items-center justify-center select-none shadow-sm w-full text-center leading-tight ${
+                            isSelected 
+                              ? 'bg-orange-500 text-white border-orange-600 shadow-orange-500/25 shadow-md' 
+                              : 'bg-slate-50 hover:bg-orange-50 border border-slate-200 hover:border-orange-300 text-slate-700 hover:text-orange-700'
+                          }`}
                         >
                           {item}
                         </button>
-                      ))}
+                      )})}
                     </div>
                   </div>
 
@@ -1065,17 +1118,23 @@ export function InventoryManager() {
                     <span className="text-[9px] font-black text-slate-400 uppercase tracking-wider flex items-center gap-1">
                       <span>🌶️</span> Ajos y Moliendas:
                     </span>
-                    <div className="flex flex-wrap gap-1.5">
-                      {['Ají Colorado Molido', 'Ajo Molido'].map((item) => (
+                    <div className="grid grid-cols-4 gap-1.5">
+                      {['Ají Colorado Molido', 'Ajo Molido'].map((item) => {
+                        const isSelected = (faltantesFrescos || []).some(f => f.nombre.toLowerCase() === item.toLowerCase() && !f.comprado);
+                        return (
                         <button
                           key={item}
                           type="button"
                           onClick={() => handleQuickFrescoTap(item)}
-                          className="px-3.5 py-2.5 rounded-2xl text-xs font-bold bg-slate-50 hover:bg-orange-50 border border-slate-200 hover:border-orange-300 text-slate-700 hover:text-orange-700 transition-all cursor-pointer min-h-[44px] active:scale-95 flex items-center select-none shadow-sm"
+                          className={`py-2.5 px-1 rounded-xl text-xs sm:text-[13px] font-bold transition-all cursor-pointer min-h-[48px] active:scale-95 flex items-center justify-center select-none shadow-sm w-full text-center leading-tight ${
+                            isSelected 
+                              ? 'bg-orange-500 text-white border-orange-600 shadow-orange-500/25 shadow-md' 
+                              : 'bg-slate-50 hover:bg-orange-50 border border-slate-200 hover:border-orange-300 text-slate-700 hover:text-orange-700'
+                          }`}
                         >
                           {item}
                         </button>
-                      ))}
+                      )})}
                     </div>
                   </div>
 
@@ -1084,121 +1143,122 @@ export function InventoryManager() {
                     <span className="text-[9px] font-black text-slate-400 uppercase tracking-wider flex items-center gap-1">
                       <span>🥩</span> Proteínas Frescas:
                     </span>
-                    <div className="flex flex-wrap gap-1.5">
-                      {['Pollo Fresco', 'Carne de Res', 'Carne de Chancho', 'Milanesa'].map((item) => (
+                    <div className="grid grid-cols-4 gap-1.5">
+                      {['Pollo Fresco', 'Carne de Res', 'Carne de Chancho', 'Milanesa'].map((item) => {
+                        const isSelected = (faltantesFrescos || []).some(f => f.nombre.toLowerCase() === item.toLowerCase() && !f.comprado);
+                        return (
                         <button
                           key={item}
                           type="button"
                           onClick={() => handleQuickFrescoTap(item)}
-                          className="px-3.5 py-2.5 rounded-2xl text-xs font-bold bg-slate-50 hover:bg-orange-50 border border-slate-200 hover:border-orange-300 text-slate-700 hover:text-orange-700 transition-all cursor-pointer min-h-[44px] active:scale-95 flex items-center select-none shadow-sm"
+                          className={`py-2.5 px-1 rounded-xl text-xs sm:text-[13px] font-bold transition-all cursor-pointer min-h-[48px] active:scale-95 flex items-center justify-center select-none shadow-sm w-full text-center leading-tight ${
+                            isSelected 
+                              ? 'bg-orange-500 text-white border-orange-600 shadow-orange-500/25 shadow-md' 
+                              : 'bg-slate-50 hover:bg-orange-50 border border-slate-200 hover:border-orange-300 text-slate-700 hover:text-orange-700'
+                          }`}
                         >
                           {item}
                         </button>
-                      ))}
+                      )})}
                     </div>
                   </div>
 
                 </div>
               </div>
 
-              {/* Card 2: Formulario Manual con Autocompletado */}
-              <div className="bg-white rounded-3xl border border-slate-200/80 p-5 shadow-sm flex flex-col gap-4">
-                <div className="pb-3 border-b border-slate-100">
-                  <h2 className="text-sm font-black text-slate-800 uppercase tracking-tight">Registro Manual / Custom</h2>
-                  <p className="text-[10.5px] text-slate-400 font-semibold mt-0.5">Usa esta sección para ingresar ítems a medida o especificar cantidades y notas.</p>
-                </div>
-
-                <div className="flex flex-col gap-3.5 relative">
-                  
-                  {/* Producto Autocomplete */}
-                  <div className="flex flex-col gap-1.5 relative">
-                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-wider">Nombre del Producto / Fresco:</label>
-                    <div className="relative">
-                      <input
-                        type="text"
-                        value={frescoNombre}
-                        onChange={(e) => handleFrescoNombreChange(e.target.value)}
-                        className="w-full rounded-2xl border border-slate-200 bg-slate-50/50 py-3.5 px-4 text-xs font-bold text-slate-800 focus:outline-none focus:border-orange-500 focus:bg-white transition-all min-h-[44px]"
-                        placeholder="Ej. Tomate, Cebolla, Ají..."
-                      />
-                      {sugerenciasFiltradas.length > 0 && (
-                        <div className="absolute left-0 right-0 mt-1.5 z-30 bg-white border border-slate-200 rounded-2xl shadow-xl overflow-hidden divide-y divide-slate-100 animate-in fade-in duration-200">
-                          {sugerenciasFiltradas.map((sug) => (
-                            <button
-                              key={sug}
-                              type="button"
-                              onClick={() => handleSelectSugerencia(sug)}
-                              className="w-full text-left py-3 px-4 text-xs font-bold text-slate-700 hover:bg-orange-50/50 hover:text-orange-700 transition-colors flex items-center justify-between cursor-pointer min-h-[44px]"
-                            >
-                              <span>{sug}</span>
-                              <span className="text-[9px] font-black uppercase text-slate-400">Autocompletar</span>
-                            </button>
-                          ))}
-                        </div>
-                      )}
-                    </div>
+              {/* Formulario Manual Simplificado */}
+              <div className="bg-white rounded-2xl sm:rounded-3xl border border-slate-200/80 p-3 sm:p-4 shadow-sm flex flex-col gap-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xl leading-none">✍️</span>
+                    <h2 className="text-sm font-black text-slate-800 uppercase tracking-tight">Otro Faltante</h2>
                   </div>
-
-                  {/* Cantidad (Opcional) */}
-                  <div className="flex flex-col gap-1.5">
-                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-wider flex justify-between items-center">
-                      <span>Cantidad / Medida:</span>
-                      <span className="text-[8.5px] bg-slate-100 text-slate-400 px-1.5 py-0.5 rounded font-bold uppercase tracking-normal">Opcional</span>
-                    </label>
-                    <input
-                      ref={frescoCantidadInputRef}
-                      type="text"
-                      value={frescoCantidad}
-                      onChange={(e) => setFrescoCantidad(e.target.value)}
-                      className="w-full rounded-2xl border border-slate-200 bg-slate-50/50 py-3.5 px-4 text-xs font-bold text-slate-800 focus:outline-none focus:border-orange-500 focus:bg-white transition-all min-h-[44px]"
-                      placeholder="Ej. 5 kg, 2 atados (o deja en blanco)"
-                    />
-                  </div>
-
-                  {/* Notas */}
-                  <div className="flex flex-col gap-1.5">
-                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-wider">Notas adicionales (opcional):</label>
-                    <textarea
-                      value={frescoNotas}
-                      onChange={(e) => setFrescoNotas(e.target.value)}
-                      rows={2}
-                      className="w-full rounded-2xl border border-slate-200 bg-slate-50/50 py-3 px-4 text-xs font-bold text-slate-800 focus:outline-none focus:border-orange-500 focus:bg-white transition-all resize-none"
-                      placeholder="Ej. Maduros para ensalada, proveedor habitual..."
-                    />
-                  </div>
-
                   <button
-                    type="button"
-                    onClick={() => {
-                      if (!frescoNombre.trim()) {
-                        addToast('Por favor, ingresa el nombre del fresco.', 'error');
-                        return;
-                      }
-                      agregarFaltanteFresco({
-                        nombre: frescoNombre.trim(),
-                        cantidad: frescoCantidad.trim() || 'No especificada',
-                        notas: frescoNotas.trim() || undefined
-                      });
-                      setFrescoNombre('');
-                      setFrescoCantidad('');
-                      setFrescoNotas('');
-                      addToast('Faltante registrado.', 'success');
-                    }}
-                    className="w-full py-3.5 rounded-2xl bg-orange-600 hover:bg-orange-700 text-white font-black text-xs uppercase tracking-wider transition-colors cursor-pointer shadow-md shadow-orange-600/10 flex items-center justify-center gap-1.5 mt-2 min-h-[44px]"
+                    onClick={() => setShowCustomFrescoInput(!showCustomFrescoInput)}
+                    className={`p-2 rounded-xl border transition-colors cursor-pointer ${
+                      showCustomFrescoInput 
+                        ? 'bg-orange-100 border-orange-200 text-orange-600' 
+                        : 'bg-slate-50 hover:bg-slate-100 border-slate-200 text-slate-600'
+                    }`}
                   >
-                    <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 4v16m8-8H4" />
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                     </svg>
-                    Agregar Faltante
                   </button>
-
                 </div>
+
+                {showCustomFrescoInput && (
+                  <div className="flex items-center gap-2 animate-in fade-in slide-in-from-top-2 duration-200 mt-1 relative">
+                    <input
+                      type="text"
+                      value={frescoNombre}
+                      onChange={(e) => handleFrescoNombreChange(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          if (!frescoNombre.trim()) return;
+                          agregarFaltanteFresco({
+                            nombre: frescoNombre.trim(),
+                            cantidad: 'No especificada',
+                            notas: ''
+                          });
+                          setFrescoNombre('');
+                          setSugerenciasFiltradas([]);
+                          setShowCustomFrescoInput(false);
+                        }
+                      }}
+                      className="flex-1 w-full rounded-2xl border border-slate-200 bg-slate-50/50 py-3 px-4 text-xs font-bold text-slate-800 focus:outline-none focus:border-orange-500 focus:bg-white transition-all min-h-[44px]"
+                      placeholder="Ej. Limones extra..."
+                      autoFocus
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (!frescoNombre.trim()) return;
+                        agregarFaltanteFresco({
+                          nombre: frescoNombre.trim(),
+                          cantidad: 'No especificada',
+                          notas: ''
+                        });
+                        setFrescoNombre('');
+                        setSugerenciasFiltradas([]);
+                        setShowCustomFrescoInput(false);
+                      }}
+                      className="w-[44px] h-[44px] rounded-2xl bg-orange-600 hover:bg-orange-700 text-white flex items-center justify-center flex-shrink-0 transition-colors shadow-md cursor-pointer"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 4v16m8-8H4" />
+                      </svg>
+                    </button>
+                    
+                    {/* Autocomplete simple dropdown */}
+                    {sugerenciasFiltradas.length > 0 && (
+                      <div className="absolute top-[50px] left-0 right-14 z-30 bg-white border border-slate-200 rounded-2xl shadow-xl overflow-hidden divide-y divide-slate-100 animate-in fade-in duration-200">
+                        {sugerenciasFiltradas.map((sug) => (
+                          <button
+                            key={sug}
+                            type="button"
+                            onClick={() => {
+                              setFrescoNombre(sug);
+                              setSugerenciasFiltradas([]);
+                            }}
+                            className="w-full text-left py-3 px-4 text-xs font-bold text-slate-700 hover:bg-orange-50/50 hover:text-orange-700 transition-colors flex items-center justify-between cursor-pointer min-h-[44px]"
+                          >
+                            <span>{sug}</span>
+                            <span className="text-[9px] font-black uppercase text-slate-400">Seleccionar</span>
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
 
             </div>
 
-            {/* LISTADO DE FALTANTES & REGISTRO DIARIO (Derecha en desktop, Inferior en móvil) */}
-            <div className="flex-1 bg-white rounded-3xl border border-slate-200/80 p-5 shadow-sm flex flex-col justify-between overflow-hidden min-h-[400px]">
+            {/* LISTADO DE FALTANTES & REGISTRO DIARIO (Derecha en desktop, toggle en móvil) */}
+            <div className={`flex-1 bg-white rounded-3xl border border-slate-200/80 p-5 shadow-sm flex-col justify-between overflow-hidden min-h-[400px] mx-4 sm:mx-0 mb-24 sm:mb-0 ${
+              mobileMercadoView === 'agregar' ? 'hidden sm:flex' : 'flex'
+            }`}>
               <div className="flex flex-col overflow-hidden h-full">
                 
                 {/* Header del Listado */}

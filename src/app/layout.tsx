@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Sidebar } from "@/components/layout/Sidebar";
@@ -18,6 +18,13 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "BOOM POS - Punto de Venta Ultra-Eficiente",
   description: "Punto de Venta y Sistema ERP de alta velocidad optimizado para Vercel y Supabase.",
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
 };
 
 export default function RootLayout({
@@ -46,9 +53,9 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className="min-h-full flex bg-base overflow-hidden" suppressHydrationWarning>
+      <body className="h-full flex bg-base overflow-hidden" suppressHydrationWarning>
         <Sidebar />
-        <div className="flex-1 flex flex-col min-h-[100dvh] overflow-y-auto relative">
+        <div className="flex-1 flex flex-col h-full overflow-hidden relative">
           <ToastProvider />
           <ConfirmModal />
           {children}

@@ -16,7 +16,7 @@ const CashRegister = dynamic(() => import('@/components/pos/CashRegister'), {
 
 export default function Home() {
   return (
-    <main className="min-h-[100dvh] bg-base">
+    <main className="h-[100dvh] bg-base overflow-hidden">
       <CashRegister />
     </main>
   );
